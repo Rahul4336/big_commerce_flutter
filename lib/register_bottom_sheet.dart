@@ -393,6 +393,7 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
                     onChanged: (value) {},
                     onCompleted: (value) {
                       otpValue=value;
+                      verifyOTP();
                     },
                   ),
                   Container(
