@@ -1250,6 +1250,7 @@ class _myprofile_pageState extends State<myprofile_page> {
                 children: [
                   InkWell(
                     onTap: (){
+                      Navigator.pop(context);
                       _getImageFromGallery();
                     },
                     child: Column(
@@ -1273,6 +1274,7 @@ class _myprofile_pageState extends State<myprofile_page> {
 
                   InkWell(
                     onTap: (){
+                      Navigator.pop(context);
                       _captureImageFromCamera();
                     },
                     child: Column(
@@ -1310,7 +1312,6 @@ class _myprofile_pageState extends State<myprofile_page> {
     setState(() {
       if (pickedImage != null) {
         _selectedImage = File(pickedImage.path);
-        Navigator.pop(context);
       }
       else {
         print('No image selected.');
@@ -1327,7 +1328,6 @@ class _myprofile_pageState extends State<myprofile_page> {
     setState(() {
       if (pickedImage != null) {
         _selectedImage = File(pickedImage.path);
-        Navigator.pop(context);
       }
       else {
         print('No image captured.');

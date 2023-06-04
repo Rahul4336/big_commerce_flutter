@@ -49,7 +49,7 @@ class _splash_screenState extends State<splash_screen> with WidgetsBindingObserv
     );
 
     // return AnnotatedRegion<SystemUiOverlayStyle>(
-    //     value: SystemUiOverlayStyle.dark, // CHANGE FOR IOS Here
+    // value: SystemUiOverlayStyle.dark, // CHANGE FOR IOS Here
 
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
