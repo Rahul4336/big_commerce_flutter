@@ -696,6 +696,10 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
       else if (store_class.opentype == 'profile') {
         navigateToProfilePage();
       }
+      else if (store_class.opentype == 'home') {
+        navigateToHomePage();
+      }
+
 
     }
     else if(response.statusCode==400){
@@ -768,6 +772,13 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     if (!_isWidgetDisposed) {
       Navigator.of(context).pop();
       widget.onTabChanged(3);
+    }
+  }
+
+  void navigateToHomePage() {
+    if (!_isWidgetDisposed) {
+      Navigator.of(context).pop();
+      widget.onTabChanged(0);
     }
   }
 

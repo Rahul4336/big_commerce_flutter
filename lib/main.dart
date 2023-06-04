@@ -1,3 +1,4 @@
+import 'package:big_commerce/add_new_address.dart';
 import 'package:big_commerce/categories_page.dart';
 import 'package:big_commerce/myorders_page.dart';
 import 'package:big_commerce/register_bottom_sheet.dart';
@@ -103,25 +104,22 @@ class _MyMainPageState extends State<MyMainPage> {
                     myindex = index;
                   });
                 } else {
-                  setState(() {
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      isDismissible: false,
-                      enableDrag: false,
-                      builder: (BuildContext context) {
-                        return SingleChildScrollView(
-                          child: Padding(
-                            padding: EdgeInsets.only(
-                              bottom: MediaQuery.of(context).viewInsets.bottom,
-                            ),
-                            child: BottomSheetWidget(onTabChanged: changeTab),
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    isDismissible: false,
+                    enableDrag: false,
+                    builder: (BuildContext context) {
+                      return SingleChildScrollView(
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                            bottom: MediaQuery.of(context).viewInsets.bottom,
                           ),
-                        );
-                      },
-                    );
-                  });
-
+                          child: BottomSheetWidget(onTabChanged: changeTab),
+                        ),
+                      );
+                    },
+                  );
                 }
               });
             }
@@ -249,7 +247,7 @@ class _Home_screenState extends State<Home_screen> with WidgetsBindingObserver  
   bool isDeliveringtolocationlayout = false;
   bool isAddAddresslayout = false;
   SharedPreferences? sharedPrefs;
-
+  int myindex = 0;
   @override
   void initState() {
     checkRegistrationStatus();
@@ -353,27 +351,49 @@ class _Home_screenState extends State<Home_screen> with WidgetsBindingObserver  
                             ),
                           ),
                           Expanded(
-                            child: Row(
-                              children: [
-                                Text(
-                                  'Signup to add location and address details',
-                                  style: TextStyle(
-                                    color: Color(0xFF424242),
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 12,
+                            child: GestureDetector(
+                              onTap: () {
+                                store_class.opentype ='home';
+                                showModalBottomSheet(
+                                  context: context,
+                                  isScrollControlled: true,
+                                  isDismissible: false,
+                                  enableDrag: false,
+                                  builder: (BuildContext context) {
+                                    return SingleChildScrollView(
+                                      child: Padding(
+                                        padding: EdgeInsets.only(
+                                          bottom: MediaQuery.of(context).viewInsets.bottom,
+                                        ),
+                                        child: BottomSheetWidget(onTabChanged: changeTab),
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
+                              child: Row(
+                                children: [
+                                  Text(
+                                    'Signup to add location and address details',
+                                    style: TextStyle(
+                                      color: Color(0xFF424242),
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
                                   ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(left: 5),
-                                  child: Image.asset(
-                                    'assets/arrow.png', // Replace with your image path
-                                    height: 18,
-                                    width: 18,
+                                  Padding(
+                                    padding: EdgeInsets.only(left: 5),
+                                    child: Image.asset(
+                                      'assets/arrow.png',
+                                      height: 18,
+                                      width: 18,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
+
                         ],
                       ),
                     ),
@@ -427,27 +447,36 @@ class _Home_screenState extends State<Home_screen> with WidgetsBindingObserver  
                             ),
                           ),
                           Expanded(
-                            child: Row(
-                              children: [
-                                Text(
-                                  'Add delivery location and address details',
-                                  style: TextStyle(
-                                    color: Color(0xFF424242),
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 12,
+                            child: GestureDetector(
+                              onTap: () {
+                                final route = MaterialPageRoute(builder: (_) => add_new_address());
+                                Future.delayed(Duration.zero, () {
+                                  Navigator.push(context, route);
+                                });
+                              },
+                              child: Row(
+                                children: [
+                                  Text(
+                                    'Add delivery location and address details',
+                                    style: TextStyle(
+                                      color: Color(0xFF424242),
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
                                   ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(left: 5),
-                                  child: Image.asset(
-                                    'assets/arrow.png', // Replace with your image path
-                                    height: 18,
-                                    width: 18,
+                                  Padding(
+                                    padding: EdgeInsets.only(left: 5),
+                                    child: Image.asset(
+                                      'assets/arrow.png',
+                                      height: 18,
+                                      width: 18,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
+
                         ],
                       ),
                     ),
@@ -460,6 +489,13 @@ class _Home_screenState extends State<Home_screen> with WidgetsBindingObserver  
         ),
       ),
     );
+  }
+
+  void changeTab(int index) {
+    setState(() {
+      myindex = index;
+      checkRegistrationStatus();
+    });
   }
 
   void checkRegistrationStatus() async {

@@ -28,13 +28,12 @@ class _add_new_addressState extends State<add_new_address> {
               key: _formKey,
               child: Column(
                 children: [
-                  Expanded(
+                  Container(
+                    height: 50,
+                    color: Color(0xfffff3f2),
                     child: Row(
                       children: [
-                        Container(
-                          color: Color(0xfffff3f2),
-                          height: 50,
-                        ),
+                        // Add your child widgets here
                       ],
                     ),
                   ),
@@ -62,7 +61,7 @@ class _add_new_addressState extends State<add_new_address> {
                               child: TextFormField(
                                 controller: _nameController,
                                 decoration:
-                                    InputDecoration(labelText: 'Enter Name'),
+                                InputDecoration(labelText: 'Enter Name'),
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
                                     return 'Please enter a name';
@@ -118,7 +117,7 @@ class _add_new_addressState extends State<add_new_address> {
                         TextFormField(
                           controller: _pincodeController,
                           decoration:
-                              InputDecoration(labelText: 'Enter Pincode'),
+                          InputDecoration(labelText: 'Enter Pincode'),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Please enter a pincode';
@@ -139,7 +138,8 @@ class _add_new_addressState extends State<add_new_address> {
                         ),
                         TextFormField(
                           controller: _cityController,
-                          decoration: InputDecoration(labelText: 'Enter City'),
+                          decoration:
+                          InputDecoration(labelText: 'Enter City'),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Please enter a city';
@@ -149,7 +149,8 @@ class _add_new_addressState extends State<add_new_address> {
                         ),
                         TextFormField(
                           controller: _stateController,
-                          decoration: InputDecoration(labelText: 'Enter State'),
+                          decoration:
+                          InputDecoration(labelText: 'Enter State'),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Please enter a state';
@@ -160,7 +161,7 @@ class _add_new_addressState extends State<add_new_address> {
                         TextFormField(
                           controller: _landmarkController,
                           decoration:
-                              InputDecoration(labelText: 'Enter Landmark'),
+                          InputDecoration(labelText: 'Enter Landmark'),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Please enter a landmark';
@@ -208,10 +209,4 @@ class _add_new_addressState extends State<add_new_address> {
 
     // Perform further actions with the form data
   }
-}
-
-void main() {
-  runApp(MaterialApp(
-    home: add_new_address(),
-  ));
 }
