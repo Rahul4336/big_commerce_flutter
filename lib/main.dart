@@ -588,6 +588,9 @@ class _myprofile_pageState extends State<myprofile_page> {
             Card(
               margin: EdgeInsets.zero,
               color: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(0),
+              ),
               child: Container(
                 height: 50,
                 padding: EdgeInsets.symmetric(horizontal: 10),

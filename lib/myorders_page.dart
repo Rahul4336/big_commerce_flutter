@@ -20,6 +20,9 @@ class _myorders_pageState extends State<myorders_page> {
         child: Card(
           margin: EdgeInsets.zero,
           color: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(0),
+          ),
           child: Container(
             height: 50,
             padding: EdgeInsets.symmetric(horizontal: 10),

@@ -21,174 +21,433 @@ class _add_new_addressState extends State<add_new_address> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: SingleChildScrollView(
-            child: Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  Container(
-                    height: 50,
-                    color: Color(0xfffff3f2),
-                    child: Row(
-                      children: [
-                        // Add your child widgets here
-                      ],
+        child: Column(
+          children: [
+            Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(0),
+              ),
+              margin: EdgeInsets.zero,
+              color: Colors.white,
+              child: SizedBox(
+                height: 50,
+                child: Row(
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        // Handle back button tap
+                      },
+                      child: const Padding(
+                        padding: EdgeInsets.all(15),
+                        child: Icon(Icons.arrow_back),
+                      ),
                     ),
-                  ),
-                  Container(
-                    color: Colors.white,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Row(
-                          children: [
-                            Expanded(
-                              child: TextFormField(
-                                controller: _phoneNumberController,
-                                decoration: InputDecoration(
-                                    labelText: 'Enter Phone number'),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please enter a phone number';
-                                  }
-                                  return null;
-                                },
-                              ),
-                            ),
-                            Expanded(
-                              child: TextFormField(
-                                controller: _nameController,
-                                decoration:
-                                InputDecoration(labelText: 'Enter Name'),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please enter a name';
-                                  }
-                                  return null;
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 16.0),
-                        Text('Choose Address Type'),
-                        RadioListTile(
-                          title: Text('Home'),
-                          value: 'Home',
-                          groupValue: _addressType,
-                          onChanged: (value) {
-                            setState(() {
-                              _addressType = value;
-                            });
-                          },
-                        ),
-                        RadioListTile(
-                          title: Text('Office'),
-                          value: 'Office',
-                          groupValue: _addressType,
-                          onChanged: (value) {
-                            setState(() {
-                              _addressType = value;
-                            });
-                          },
-                        ),
-                        RadioListTile(
-                          title: Text('Other'),
-                          value: 'Other',
-                          groupValue: _addressType,
-                          onChanged: (value) {
-                            setState(() {
-                              _addressType = value;
-                            });
-                          },
-                        ),
-                      ],
+                    const Text(
+                      'Delivery Address',
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: Colors.black,
+                      ),
                     ),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Container(
-                    color: Colors.white,
-                    child: Column(
-                      children: [
-                        TextFormField(
-                          controller: _pincodeController,
-                          decoration:
-                          InputDecoration(labelText: 'Enter Pincode'),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter a pincode';
-                            }
-                            return null;
-                          },
-                        ),
-                        TextFormField(
-                          controller: _addressController,
-                          decoration: InputDecoration(
-                              labelText: 'Enter Complete Address'),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter a complete address';
-                            }
-                            return null;
-                          },
-                        ),
-                        TextFormField(
-                          controller: _cityController,
-                          decoration:
-                          InputDecoration(labelText: 'Enter City'),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter a city';
-                            }
-                            return null;
-                          },
-                        ),
-                        TextFormField(
-                          controller: _stateController,
-                          decoration:
-                          InputDecoration(labelText: 'Enter State'),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter a state';
-                            }
-                            return null;
-                          },
-                        ),
-                        TextFormField(
-                          controller: _landmarkController,
-                          decoration:
-                          InputDecoration(labelText: 'Enter Landmark'),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter a landmark';
-                            }
-                            return null;
-                          },
-                        ),
-                        ElevatedButton(
-                          onPressed: () {
-                            if (_formKey.currentState?.validate() == true) {
-                              _submitForm();
-                            }
-                          },
-                          child: Text('Submit'),
-                        ),
-                      ],
-                    ),
-                  )
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
+
+
+            Expanded(
+              child: SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      Container(
+                        height: 50,
+                        color: const Color(0xFFFFF2F1),
+                        child: Row(children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 15,right: 5),
+                            child: SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: Image.asset('assets/info.png'),
+                            ),
+                          ),
+
+                          const Text('Order will be deliver to this address',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: Colors.red,
+                              fontSize: 12,
+                            ),
+                          ),
+
+                        ],),
+
+                      ),
+
+                      Container(
+                        color: Colors.white,
+                        child: Padding(
+                          padding: const EdgeInsets.all(15),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+
+
+                              Column(children: [
+                                Row(
+                                  children: [
+                                    SizedBox(
+                                        width: 24, height: 24,
+                                        child: Image.asset('assets/call.png')
+                                    ),
+                                    const Padding(
+                                      padding: EdgeInsets.only(left: 5),
+                                      child: Text(
+                                        'Contact Details',
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w700
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+
+                                const SizedBox(height: 5,),
+
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 28),
+                                  child: Row(
+                                    children: [
+                                      SizedBox(
+                                          width: 20, height: 20,
+                                          child: Image.asset('assets/verify.png')
+                                      ),
+                                      const Padding(
+                                        padding: EdgeInsets.only(left: 5),
+                                        child: Text(
+                                          '+91-8445655000',
+                                          style: TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w700,
+                                            color: Colors.black54,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+
+                              ],),
+
+                              const SizedBox(height: 10,),
+
+
+                              Row(
+                                children: [
+                                  Expanded(child:   TextFormField(
+                                    controller: _nameController,
+                                    decoration: const InputDecoration(
+                                      labelText: 'Enter name',
+                                      labelStyle: TextStyle(fontSize: 15),
+                                      contentPadding: EdgeInsets.symmetric(vertical: 4),
+                                    ),
+
+                                    style: const TextStyle(fontSize: 14),
+
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Please enter a name';
+                                      }
+                                      return null;
+                                    },
+                                  ),),
+
+                                  SizedBox(width: 20,),
+
+                                  Expanded(child:    TextFormField(
+                                    controller: _phoneNumberController,
+                                    decoration: const InputDecoration(
+                                      labelText: 'Enter phone no',
+                                      labelStyle: TextStyle(fontSize: 15),
+                                      contentPadding: EdgeInsets.symmetric(vertical: 4),
+                                    ),
+
+                                    style: const TextStyle(fontSize: 14),
+
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Please enter a phone number';
+                                      }
+                                      return null;
+                                    },
+                                  ),),
+
+                                ],
+                              ),
+
+
+                              const SizedBox(height: 20),
+
+                              const Text('Choose Address Type',
+                                style: TextStyle(fontSize: 15,
+                                color: Colors.black54),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      Container(
+                        color: Colors.white,
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        _addressType = 'Home';
+                                      });
+                                    },
+                                    child: Row(
+                                      children: [
+                                        Radio(
+                                          value: 'Home',
+                                          groupValue: _addressType,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              _addressType = value;
+                                            });
+                                          },
+                                        ),
+                                        const Text(
+                                          'Home',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+
+                                Expanded(
+                                  child: InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        _addressType = 'Office';
+                                      });
+                                    },
+                                    child: Row(
+                                      children: [
+                                        Radio(
+                                          value: 'Office',
+                                          groupValue: _addressType,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              _addressType = value;
+                                            });
+                                          },
+                                        ),
+                                        const Text(
+                                          'Office',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        _addressType = 'Other';
+                                      });
+                                    },
+                                    child: Row(
+                                      children: [
+                                        Radio(
+                                          value: 'Other',
+                                          groupValue: _addressType,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              _addressType = value;
+                                            });
+                                          },
+                                        ),
+                                        const Text(
+                                          'Other',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+
+                              ],
+                            ),
+                            const SizedBox(height: 10,)
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      Container(
+                        color: Colors.white,
+                        child: Padding(
+                          padding: const EdgeInsets.all(15),
+                          child: Column(
+                            children: [
+
+                              Row(
+                                children: [
+                                  SizedBox(
+                                      width: 24, height: 24,
+                                      child: Image.asset('assets/locationadd.png')
+                                  ),
+                                  const Padding(
+                                    padding: EdgeInsets.only(left: 5),
+                                    child: Text(
+                                      'Address Details',
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w700
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              const SizedBox(height: 10,),
+
+
+                              TextFormField(
+                                controller: _pincodeController,
+                                decoration:
+                                const InputDecoration(
+                                    labelText: 'Enter Pincode',
+                                  labelStyle: TextStyle(fontSize: 15),
+                                ),
+
+                                style: const TextStyle(fontSize: 14),
+
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter a pincode';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              TextFormField(
+                                controller: _addressController,
+                                decoration: const InputDecoration(
+                                    labelText: 'Enter Complete Address',
+                                  labelStyle: TextStyle(fontSize: 15),),
+
+                                style: const TextStyle(fontSize: 14),
+
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter a complete address';
+                                  }
+                                  return null;
+                                },
+                              ),
+
+                              Row(
+                                children: [
+                                  Expanded(child: TextFormField(
+                                    controller: _cityController,
+                                    decoration:
+                                    const InputDecoration(labelText: 'Enter City',
+                                      labelStyle: TextStyle(fontSize: 15),),
+
+                                    style: const TextStyle(fontSize: 14),
+
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Please enter a city';
+                                      }
+                                      return null;
+                                    },
+                                  ),),
+
+                                  SizedBox(width: 20,),
+
+                                  Expanded(child:   TextFormField(
+                                    controller: _stateController,
+                                    decoration:
+                                    const InputDecoration(labelText: 'Enter State',
+                                      labelStyle: TextStyle(fontSize: 15),),
+
+                                    style: const TextStyle(fontSize: 14),
+
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Please enter a state';
+                                      }
+                                      return null;
+                                    },
+                                  ),),
+
+                                ],
+                              ),
+
+                              TextFormField(
+                                controller: _landmarkController,
+                                decoration:
+                                const InputDecoration(labelText: 'Enter Landmark',
+                                  labelStyle: TextStyle(fontSize: 15),),
+
+                                style: const TextStyle(fontSize: 14),
+
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter a landmark';
+                                  }
+                                  return null;
+                                },
+                              ),
+
+                              SizedBox(height: 20,),
+
+                              Container(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    if (_formKey.currentState?.validate() ==
+                                        true) {
+                                      _submitForm();
+                                    }
+                                  },
+                                  child: const Text('Submit'),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
-
   void _submitForm() {
     String name = _nameController.text;
     String phoneNumber = _phoneNumberController.text;
