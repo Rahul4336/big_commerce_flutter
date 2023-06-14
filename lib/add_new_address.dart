@@ -1,5 +1,9 @@
-import 'package:flutter/cupertino.dart';
+import 'package:big_commerce/store_class.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class add_new_address extends StatefulWidget {
   @override
@@ -15,7 +19,18 @@ class _add_new_addressState extends State<add_new_address> {
   final TextEditingController _cityController = TextEditingController();
   final TextEditingController _stateController = TextEditingController();
   final TextEditingController _landmarkController = TextEditingController();
+
+
   String? _addressType;
+  List<dynamic> data = [];
+  int selectedIndex = 0;
+  String? mobno, ccode;
+
+  @override
+  void initState() {
+    super.initState();
+    updateUI();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -118,17 +133,17 @@ class _add_new_addressState extends State<add_new_address> {
                                 const SizedBox(height: 5,),
 
                                 Padding(
-                                  padding: const EdgeInsets.only(left: 28),
+                                  padding: EdgeInsets.only(left: 28),
                                   child: Row(
                                     children: [
                                       SizedBox(
                                           width: 20, height: 20,
                                           child: Image.asset('assets/verify.png')
                                       ),
-                                      const Padding(
+                                      Padding(
                                         padding: EdgeInsets.only(left: 5),
                                         child: Text(
-                                          '+91-8445655000',
+                                          "+$ccode-$mobno",
                                           style: TextStyle(
                                               fontSize: 11,
                                               fontWeight: FontWeight.w700,
@@ -168,16 +183,19 @@ class _add_new_addressState extends State<add_new_address> {
 
                                   SizedBox(width: 20,),
 
-                                  Expanded(child:    TextFormField(
+                                  Expanded(child: TextFormField(
                                     controller: _phoneNumberController,
-                                    decoration: const InputDecoration(
+                                    decoration: InputDecoration(
                                       labelText: 'Enter phone no',
                                       labelStyle: TextStyle(fontSize: 15),
                                       contentPadding: EdgeInsets.symmetric(vertical: 4),
                                     ),
 
-                                    style: const TextStyle(fontSize: 14),
-
+                                    style: TextStyle(fontSize: 14),
+                                    keyboardType: TextInputType.phone,
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.digitsOnly,
+                                    ],
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return 'Please enter a phone number';
@@ -341,7 +359,10 @@ class _add_new_addressState extends State<add_new_address> {
                                 ),
 
                                 style: const TextStyle(fontSize: 14),
-
+                                keyboardType: TextInputType.phone,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                ],
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
                                     return 'Please enter a pincode';
@@ -412,12 +433,6 @@ class _add_new_addressState extends State<add_new_address> {
 
                                 style: const TextStyle(fontSize: 14),
 
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please enter a landmark';
-                                  }
-                                  return null;
-                                },
                               ),
 
                               SizedBox(height: 20,),
@@ -466,6 +481,30 @@ class _add_new_addressState extends State<add_new_address> {
     print('State: $state');
     print('Landmark: $landmark');
 
-    // Perform further actions with the form data
   }
+
+  void updateUI() async {
+    SharedPreferences sharedPrefs = await SharedPreferences.getInstance();
+    setState(() {
+      mobno = sharedPrefs.getString("mobno");
+      ccode = sharedPrefs.getString("ccode");
+    });
+  }
+
+  Future<void> getDataFromPinCode(String pinCode) async {
+    final response = await http.get(
+      Uri.parse(store_class.postalURL + pinCode),
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      setState(() {
+        data = responseData['Data'];
+      });
+    }
+    else {
+      print('Error: ${response.statusCode}');
+    }
+  }
+
 }

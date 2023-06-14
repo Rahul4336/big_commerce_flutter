@@ -105,7 +105,7 @@ class _splash_screenState extends State<splash_screen> with WidgetsBindingObserv
     );
 
     if (response.statusCode == 200) {
-      Timer(Duration(seconds: 2),(){
+      Timer(Duration(seconds: 0),(){
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MyMainPage(),));
       });
     } else {

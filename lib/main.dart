@@ -1,4 +1,5 @@
 import 'package:big_commerce/add_new_address.dart';
+import 'package:big_commerce/address_list.dart';
 import 'package:big_commerce/categories_page.dart';
 import 'package:big_commerce/myorders_page.dart';
 import 'package:big_commerce/register_bottom_sheet.dart';
@@ -524,6 +525,7 @@ class _Home_screenState extends State<Home_screen> with WidgetsBindingObserver  
 
     });
   }
+
 }
 
 
@@ -759,31 +761,37 @@ class _myprofile_pageState extends State<myprofile_page> {
                         SizedBox(
                           height: 7,
                         ),
-                        Container(
-                          height: 53,
-                          color: Colors.white,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              IconButton(
-                                padding: EdgeInsets.all(10),
-                                icon: Image.asset(
-                                  'assets/location.png', // Replace with your image path
-                                  width: 22,
-                                  height: 22,
+                        InkWell(
+                          onTap: (){
+                            final route = MaterialPageRoute(builder: (_) => address_list());
+                            Navigator.push(context, route);
+                          },
+                          child: Container(
+                            height: 53,
+                            color: Colors.white,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                IconButton(
+                                  padding: EdgeInsets.all(10),
+                                  icon: Image.asset(
+                                    'assets/location.png', // Replace with your image path
+                                    width: 22,
+                                    height: 22,
+                                  ),
+                                  onPressed: () {
+                                    // Add your favorite functionality here
+                                  },
                                 ),
-                                onPressed: () {
-                                  // Add your favorite functionality here
-                                },
-                              ),
-                              Text(
-                                'Manage your Address',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  color: Colors.black,
+                                Text(
+                                  'Manage your Address',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: Colors.black,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                         SizedBox(
