@@ -17,6 +17,7 @@ class _categories_pageState extends State<categories_page> {
   List<dynamic> category = [];
   SharedPreferences? sharedPrefs;
   int selectedIndex = 0;
+  String? cat_img_path;
   @override
   void initState() {
     fetchMainCategory();
@@ -37,6 +38,7 @@ class _categories_pageState extends State<categories_page> {
     if (response.statusCode == 200) {
       final responseData = jsonDecode(response.body);
       setState(() {
+        cat_img_path=responseData['img_path'];
         data = responseData['Data'];
       });
     }
@@ -123,7 +125,7 @@ class _categories_pageState extends State<categories_page> {
                             height: 18,
                           ),
                           onPressed: () {
-                            // Add your shopping cart functionality here
+
                           },
                         ),
                       ],
@@ -185,7 +187,7 @@ class _categories_pageState extends State<categories_page> {
                                         crossAxisAlignment: CrossAxisAlignment.center, // Center items horizontally
                                         children: [
                                           Image.network(
-                                            '${store_class.base_url}static/mcat/$iconname',
+                                            store_class.base_url+cat_img_path!+iconname,
                                             height: 20,
                                           ),
 
@@ -299,7 +301,4 @@ class _categories_pageState extends State<categories_page> {
       ),
     );
   }
-
-
-
 }

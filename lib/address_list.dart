@@ -79,7 +79,9 @@ class address_list_State extends State<address_list> with WidgetsBindingObserver
                       SizedBox(height: 10),
                       GestureDetector(
                         onTap: () {
-                          // Add your desired action here
+                          store_class.isUpdateAddress=false;
+                          final route = MaterialPageRoute(builder: (_) => add_new_address());
+                          Navigator.push(context, route);
                         },
                         child: Container(
                           padding: EdgeInsets.all(10),
@@ -144,6 +146,7 @@ class address_list_State extends State<address_list> with WidgetsBindingObserver
                 ),
                 InkWell(
                   onTap: () {
+                    store_class.isUpdateAddress=false;
                     final route = MaterialPageRoute(builder: (_) => add_new_address());
                     Navigator.push(context, route);
                   },
@@ -267,7 +270,12 @@ class address_list_State extends State<address_list> with WidgetsBindingObserver
                                               children: [
                                                 InkWell(
                                                   onTap: () {
-                                                   print('edit');
+                                                    store_class.isUpdateAddress=true;
+                                                    store_class.address_uid=uid;
+                                                    final route = MaterialPageRoute(builder: (_) => add_new_address());
+                                                    Future.delayed(Duration.zero, () {
+                                                      Navigator.push(context, route);
+                                                    });
                                                   },
                                                   child: Container(
                                                     padding: EdgeInsets.only(left: 5),

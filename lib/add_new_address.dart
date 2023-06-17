@@ -1,6 +1,7 @@
 import 'package:big_commerce/store_class.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -13,15 +14,15 @@ class add_new_address extends StatefulWidget {
 class _add_new_addressState extends State<add_new_address> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _phoneNumberController = TextEditingController();
+  final TextEditingController _phoneNumberController = TextEditingController(text: '');
   final TextEditingController _pincodeController = TextEditingController();
-  final TextEditingController _addressController = TextEditingController();
-  final TextEditingController _cityController = TextEditingController();
-  final TextEditingController _stateController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController(text: '');
+  final TextEditingController _cityController = TextEditingController(text: '');
+  final TextEditingController _stateController = TextEditingController(text: '');
   final TextEditingController _landmarkController = TextEditingController();
 
 
-  String? _addressType;
+  String _addressType="Home";
   List<dynamic> data = [];
   int selectedIndex = 0;
   String? mobno, ccode;
@@ -30,6 +31,17 @@ class _add_new_addressState extends State<add_new_address> {
   void initState() {
     super.initState();
     updateUI();
+    _pincodeController.addListener(() {
+      if (_pincodeController.text.length > 3) {
+        if (!store_class.isUpdateAddress) {
+          getDataFromPinCode(_pincodeController.text);
+        }
+      }
+    });
+
+    if (store_class.isUpdateAddress) {
+      getAddress();
+    }
   }
 
   @override
@@ -109,7 +121,6 @@ class _add_new_addressState extends State<add_new_address> {
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
 
-
                               Column(children: [
                                 Row(
                                   children: [
@@ -133,7 +144,7 @@ class _add_new_addressState extends State<add_new_address> {
                                 const SizedBox(height: 5,),
 
                                 Padding(
-                                  padding: EdgeInsets.only(left: 28),
+                                  padding: const EdgeInsets.only(left: 28),
                                   child: Row(
                                     children: [
                                       SizedBox(
@@ -141,7 +152,7 @@ class _add_new_addressState extends State<add_new_address> {
                                           child: Image.asset('assets/verify.png')
                                       ),
                                       Padding(
-                                        padding: EdgeInsets.only(left: 5),
+                                        padding: const EdgeInsets.only(left: 5),
                                         child: Text(
                                           "+$ccode-$mobno",
                                           style: TextStyle(
@@ -155,11 +166,9 @@ class _add_new_addressState extends State<add_new_address> {
                                   ),
                                 ),
 
-
                               ],),
 
                               const SizedBox(height: 10,),
-
 
                               Row(
                                 children: [
@@ -185,13 +194,13 @@ class _add_new_addressState extends State<add_new_address> {
 
                                   Expanded(child: TextFormField(
                                     controller: _phoneNumberController,
-                                    decoration: InputDecoration(
+                                    decoration: const InputDecoration(
                                       labelText: 'Enter phone no',
                                       labelStyle: TextStyle(fontSize: 15),
                                       contentPadding: EdgeInsets.symmetric(vertical: 4),
                                     ),
 
-                                    style: TextStyle(fontSize: 14),
+                                    style: const TextStyle(fontSize: 14),
                                     keyboardType: TextInputType.phone,
                                     inputFormatters: [
                                       FilteringTextInputFormatter.digitsOnly,
@@ -210,7 +219,7 @@ class _add_new_addressState extends State<add_new_address> {
 
                               const SizedBox(height: 20),
 
-                              const Text('Choose Address Type',
+                              Text('Choose Address Type',
                                 style: TextStyle(fontSize: 15,
                                 color: Colors.black54),
                               ),
@@ -239,11 +248,11 @@ class _add_new_addressState extends State<add_new_address> {
                                           groupValue: _addressType,
                                           onChanged: (value) {
                                             setState(() {
-                                              _addressType = value;
+                                              _addressType = value!;
                                             });
                                           },
                                         ),
-                                        const Text(
+                                        Text(
                                           'Home',
                                           style: TextStyle(
                                             fontSize: 12,
@@ -268,7 +277,7 @@ class _add_new_addressState extends State<add_new_address> {
                                           groupValue: _addressType,
                                           onChanged: (value) {
                                             setState(() {
-                                              _addressType = value;
+                                              _addressType = value!;
                                             });
                                           },
                                         ),
@@ -296,7 +305,7 @@ class _add_new_addressState extends State<add_new_address> {
                                           groupValue: _addressType,
                                           onChanged: (value) {
                                             setState(() {
-                                              _addressType = value;
+                                              _addressType = value!;
                                             });
                                           },
                                         ),
@@ -408,6 +417,7 @@ class _add_new_addressState extends State<add_new_address> {
 
                                   Expanded(child:   TextFormField(
                                     controller: _stateController,
+
                                     decoration:
                                     const InputDecoration(labelText: 'Enter State',
                                       labelStyle: TextStyle(fontSize: 15),),
@@ -441,9 +451,13 @@ class _add_new_addressState extends State<add_new_address> {
                                 width: double.infinity,
                                 child: ElevatedButton(
                                   onPressed: () {
-                                    if (_formKey.currentState?.validate() ==
-                                        true) {
-                                      _submitForm();
+                                    if (_formKey.currentState?.validate() == true) {
+                                      if(store_class.isUpdateAddress){
+                                        updateAddress();
+                                      }
+                                      else {
+                                        addNewAddress();
+                                      }
                                     }
                                   },
                                   child: const Text('Submit'),
@@ -463,24 +477,91 @@ class _add_new_addressState extends State<add_new_address> {
       ),
     );
   }
-  void _submitForm() {
-    String name = _nameController.text;
-    String phoneNumber = _phoneNumberController.text;
-    String pincode = _pincodeController.text;
-    String address = _addressController.text;
-    String city = _cityController.text;
-    String state = _stateController.text;
-    String landmark = _landmarkController.text;
 
-    print('Name: $name');
-    print('Phone number: $phoneNumber');
-    print('Address Type: $_addressType');
-    print('Pincode: $pincode');
-    print('Complete Address: $address');
-    print('City: $city');
-    print('State: $state');
-    print('Landmark: $landmark');
+  Future<void> addNewAddress() async {
+    SharedPreferences sharedPrefs= await SharedPreferences.getInstance();
+    var requestBody = {
+      'full_name':_nameController.text,
+      'ccode': ccode,
+      'phone': _phoneNumberController.text,
+      'pincode':_pincodeController.text,
+      'address': _addressController.text,
+      'city': _cityController.text,
+      'state':_stateController.text,
+      'landmark': _landmarkController.text,
+      'address_type': _addressType,
+    };
 
+    try {
+      var response = await http.post(
+        Uri.parse("${store_class.base_url}user/address"),
+        body: jsonEncode(requestBody),
+        headers: {
+          'Content-Type': 'application/json',
+          "dtoken": sharedPrefs.getString("dtoken") ?? "",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        Fluttertoast.showToast(msg: "Address Added", toastLength: Toast.LENGTH_LONG, gravity: ToastGravity.BOTTOM, backgroundColor: Colors.white60, textColor: Colors.black,);
+
+        sharedPrefs = await SharedPreferences.getInstance();
+        sharedPrefs.setString("address", "true");
+        setState(() {
+          finish();
+        });
+      }
+      else {
+        print('POST request failed with status: ${response.statusCode}');
+      }
+    }
+    catch (error) {
+      print('Exception occurred: $error');
+    }
+
+  }
+
+  Future<void> updateAddress() async{
+    SharedPreferences sharedPrefs= await SharedPreferences.getInstance();
+    var requestBody = {
+      'full_name':_nameController.text,
+      'ccode': ccode,
+      'phone': _phoneNumberController.text,
+      'pincode':_pincodeController.text,
+      'address': _addressController.text,
+      'city': _cityController.text,
+      'state':_stateController.text,
+      'landmark': _landmarkController.text,
+      'address_type': _addressType,
+    };
+
+    try {
+      var response = await http.put(
+        Uri.parse("${store_class.base_url}user/address/${store_class.address_uid}"),
+        body: jsonEncode(requestBody),
+        headers: {
+          'Content-Type': 'application/json',
+          "dtoken": sharedPrefs.getString("dtoken") ?? "",
+        },
+      );
+
+      print(requestBody);
+
+      if (response.statusCode == 200) {
+        Fluttertoast.showToast(msg: "Address Updated", toastLength: Toast.LENGTH_LONG, gravity: ToastGravity.BOTTOM, backgroundColor: Colors.white60, textColor: Colors.black,);
+        setState(() {
+          finish();
+        });
+      } else {
+        print('POST request failed with status: ${response.statusCode}');
+      }
+    } catch (error) {
+      print('Exception occurred: $error');
+    }
+  }
+
+  void finish() {
+    Navigator.pop(context);
   }
 
   void updateUI() async {
@@ -488,6 +569,7 @@ class _add_new_addressState extends State<add_new_address> {
     setState(() {
       mobno = sharedPrefs.getString("mobno");
       ccode = sharedPrefs.getString("ccode");
+      _phoneNumberController.text=mobno!;
     });
   }
 
@@ -499,7 +581,10 @@ class _add_new_addressState extends State<add_new_address> {
     if (response.statusCode == 200) {
       final responseData = jsonDecode(response.body);
       setState(() {
-        data = responseData['Data'];
+        data = responseData['PostOffice'];
+        _stateController.text=data[0]['State'];
+        _cityController.text=data[0]['District'];
+        _addressController.text=data[0]['Name'];
       });
     }
     else {
@@ -507,4 +592,31 @@ class _add_new_addressState extends State<add_new_address> {
     }
   }
 
+  Future<void> getAddress() async {
+    SharedPreferences sharedPrefs = await SharedPreferences.getInstance();
+    final headers = {
+      "dtoken": sharedPrefs.getString("dtoken") ?? "",
+    };
+
+    final response = await http.get(
+      Uri.parse("${store_class.base_url}user/address/${store_class.address_uid}"),
+      headers: headers,
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      setState(() {
+        _stateController.text=responseData['state'];
+        _cityController.text=responseData['city'];
+        _addressController.text=responseData['address'];
+        _nameController.text=responseData['full_name'];
+        _phoneNumberController.text=responseData['phone'];
+        _landmarkController.text=responseData['landmark'];
+        _pincodeController.text=responseData['pincode'];
+      });
+    }
+    else {
+      print('Error: ${response.statusCode}');
+    }
+  }
 }
