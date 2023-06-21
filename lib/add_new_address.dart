@@ -5,6 +5,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'address_list.dart';
+
 
 class add_new_address extends StatefulWidget {
   @override
@@ -21,6 +23,7 @@ class _add_new_addressState extends State<add_new_address> {
   final TextEditingController _stateController = TextEditingController(text: '');
   final TextEditingController _landmarkController = TextEditingController();
 
+  address_list_State addressListState = address_list_State();
 
   String _addressType="Home";
   List<dynamic> data = [];
@@ -62,7 +65,7 @@ class _add_new_addressState extends State<add_new_address> {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        // Handle back button tap
+                      finish();
                       },
                       child: const Padding(
                         padding: EdgeInsets.all(15),
@@ -95,9 +98,9 @@ class _add_new_addressState extends State<add_new_address> {
                           Padding(
                             padding: const EdgeInsets.only(left: 15,right: 5),
                             child: SizedBox(
-                                width: 24,
-                                height: 24,
-                                child: Image.asset('assets/info.png'),
+                              width: 24,
+                              height: 24,
+                              child: Image.asset('assets/info.png'),
                             ),
                           ),
 
@@ -156,8 +159,8 @@ class _add_new_addressState extends State<add_new_address> {
                                         child: Text(
                                           "+$ccode-$mobno",
                                           style: TextStyle(
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.w700,
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w700,
                                             color: Colors.black54,
                                           ),
                                         ),
@@ -221,7 +224,7 @@ class _add_new_addressState extends State<add_new_address> {
 
                               Text('Choose Address Type',
                                 style: TextStyle(fontSize: 15,
-                                color: Colors.black54),
+                                    color: Colors.black54),
                               ),
                             ],
                           ),
@@ -363,7 +366,7 @@ class _add_new_addressState extends State<add_new_address> {
                                 controller: _pincodeController,
                                 decoration:
                                 const InputDecoration(
-                                    labelText: 'Enter Pincode',
+                                  labelText: 'Enter Pincode',
                                   labelStyle: TextStyle(fontSize: 15),
                                 ),
 
@@ -382,7 +385,7 @@ class _add_new_addressState extends State<add_new_address> {
                               TextFormField(
                                 controller: _addressController,
                                 decoration: const InputDecoration(
-                                    labelText: 'Enter Complete Address',
+                                  labelText: 'Enter Complete Address',
                                   labelStyle: TextStyle(fontSize: 15),),
 
                                 style: const TextStyle(fontSize: 14),
@@ -507,9 +510,7 @@ class _add_new_addressState extends State<add_new_address> {
 
         sharedPrefs = await SharedPreferences.getInstance();
         sharedPrefs.setString("address", "true");
-        setState(() {
-          finish();
-        });
+        finish();
       }
       else {
         print('POST request failed with status: ${response.statusCode}');
@@ -549,9 +550,7 @@ class _add_new_addressState extends State<add_new_address> {
 
       if (response.statusCode == 200) {
         Fluttertoast.showToast(msg: "Address Updated", toastLength: Toast.LENGTH_LONG, gravity: ToastGravity.BOTTOM, backgroundColor: Colors.white60, textColor: Colors.black,);
-        setState(() {
-          finish();
-        });
+        finish();
       } else {
         print('POST request failed with status: ${response.statusCode}');
       }
@@ -561,7 +560,7 @@ class _add_new_addressState extends State<add_new_address> {
   }
 
   void finish() {
-    Navigator.pop(context);
+    Navigator.pop(context,'refresh');
   }
 
   void updateUI() async {

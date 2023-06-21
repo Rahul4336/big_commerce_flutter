@@ -1,22 +1,27 @@
 import 'package:big_commerce/store_class.dart';
+import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import 'package:big_commerce/add_new_address.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'add_new_address.dart';
 
 class address_list extends StatefulWidget {
   address_list_State createState() => address_list_State();
 }
 
-class address_list_State extends State<address_list> with WidgetsBindingObserver {
+class address_list_State extends State<address_list>
+    with WidgetsBindingObserver {
   List<dynamic> data = [];
   int selectedIndex = 0;
-  bool isEmpview=false;
-  bool islistview=false;
+  bool isEmpview = false;
+  bool islistview = false;
   bool isLoading = false;
-  bool isEditLayout=true;
+  bool isEditLayout = true;
+  bool isRefresh = false;
   @override
   void initState() {
     super.initState();
@@ -52,7 +57,7 @@ class address_list_State extends State<address_list> with WidgetsBindingObserver
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      Text(
+                      const Text(
                         'SAVE YOUR ADDRESS NOW',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
@@ -61,14 +66,14 @@ class address_list_State extends State<address_list> with WidgetsBindingObserver
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       SizedBox(
                         width: 57,
                         height: 57,
                         child: Image.asset('assets/shopadd.png'),
                       ),
-                      SizedBox(height: 10),
-                      Text(
+                      const SizedBox(height: 10),
+                      const Text(
                         'Add your home and office address and enjoy faster checkout',
                         style: TextStyle(
                           fontSize: 11,
@@ -76,22 +81,29 @@ class address_list_State extends State<address_list> with WidgetsBindingObserver
                         ),
                         textAlign: TextAlign.center,
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       GestureDetector(
-                        onTap: () {
-                          store_class.isUpdateAddress=false;
-                          final route = MaterialPageRoute(builder: (_) => add_new_address());
-                          Navigator.push(context, route);
+                        onTap: () async {
+                          store_class.isUpdateAddress = false;
+
+                          String refresh = await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => add_new_address()));
+
+                          if (refresh == 'refresh') {
+                            getAddressList();
+                          }
                         },
                         child: Container(
-                          padding: EdgeInsets.all(10),
-                          margin: EdgeInsets.symmetric(horizontal: 10),
+                          padding: const EdgeInsets.all(10),
+                          margin: const EdgeInsets.symmetric(horizontal: 10),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(5),
                             border: Border.all(color: Colors.red),
                           ),
-                          child: Row(
+                          child: const Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(Icons.add, color: Colors.red),
@@ -126,7 +138,7 @@ class address_list_State extends State<address_list> with WidgetsBindingObserver
                       children: [
                         GestureDetector(
                           onTap: () {
-                            // Handle back button tap
+                            Navigator.pop(context);
                           },
                           child: const Padding(
                             padding: EdgeInsets.all(15),
@@ -145,10 +157,14 @@ class address_list_State extends State<address_list> with WidgetsBindingObserver
                   ),
                 ),
                 InkWell(
-                  onTap: () {
-                    store_class.isUpdateAddress=false;
-                    final route = MaterialPageRoute(builder: (_) => add_new_address());
-                    Navigator.push(context, route);
+                  onTap: () async{
+                    store_class.isUpdateAddress = false;
+                    String refresh = await Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => add_new_address()));
+                    if (refresh == 'refresh') {
+                      getAddressList();
+                    }
                   },
                   child: Container(
                     height: 50,
@@ -176,6 +192,8 @@ class address_list_State extends State<address_list> with WidgetsBindingObserver
                     ),
                   ),
                 ),
+                isRefresh
+                    ?
                 Expanded(
                   child: Stack(
                     children: [
@@ -201,7 +219,7 @@ class address_list_State extends State<address_list> with WidgetsBindingObserver
                               onTap: () {
                                 setState(() {
                                   selectedIndex = index;
-                                  isEditLayout=true;
+                                  isEditLayout = true;
                                 });
                               },
                               child: Container(
@@ -209,10 +227,13 @@ class address_list_State extends State<address_list> with WidgetsBindingObserver
                                 padding: EdgeInsets.all(10),
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(8),
-                                  color: selectedIndex == index ? Color(0xFFE4E4E4) : Colors.white,
+                                  color: selectedIndex == index
+                                      ? Color(0xFFE4E4E4)
+                                      : Colors.white,
                                 ),
                                 child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
                                   children: [
                                     SizedBox(height: 5),
                                     Text(
@@ -226,10 +247,11 @@ class address_list_State extends State<address_list> with WidgetsBindingObserver
                                     SizedBox(height: 10),
                                     Row(
                                       children: [
-                                        Image.asset('assets/mobile.png', width: 10, height: 10),
+                                        Image.asset('assets/mobile.png',
+                                            width: 10, height: 10),
                                         SizedBox(width: 2),
                                         Text(
-                                          '+91-8447199389',
+                                          phone,
                                           style: TextStyle(
                                             fontSize: 10,
                                             color: Colors.red,
@@ -239,14 +261,17 @@ class address_list_State extends State<address_list> with WidgetsBindingObserver
                                     ),
                                     SizedBox(height: 10),
                                     Text(
-                                      address+"\n"+state+" | "+city,
+                                      address +
+                                          "\n" +
+                                          state +
+                                          " | " +
+                                          city,
                                       style: TextStyle(
                                         fontSize: 12,
                                         color: Colors.grey,
                                       ),
                                     ),
                                     SizedBox(height: 10),
-
                                     Row(
                                       children: [
                                         Expanded(
@@ -261,24 +286,40 @@ class address_list_State extends State<address_list> with WidgetsBindingObserver
                                           ),
                                         ),
                                         Visibility(
-                                          visible: selectedIndex == index && isEditLayout,
+                                          visible:
+                                          selectedIndex == index &&
+                                              isEditLayout,
                                           child: Expanded(
                                             flex: 2,
                                             child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              mainAxisAlignment:
+                                              MainAxisAlignment
+                                                  .spaceBetween,
+                                              crossAxisAlignment:
+                                              CrossAxisAlignment
+                                                  .center,
                                               children: [
                                                 InkWell(
-                                                  onTap: () {
-                                                    store_class.isUpdateAddress=true;
-                                                    store_class.address_uid=uid;
-                                                    final route = MaterialPageRoute(builder: (_) => add_new_address());
-                                                    Future.delayed(Duration.zero, () {
-                                                      Navigator.push(context, route);
-                                                    });
+                                                  onTap: () async {
+                                                    store_class
+                                                        .isUpdateAddress =
+                                                    true;
+                                                    store_class
+                                                        .address_uid =
+                                                        uid;
+                                                    String refresh = await Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                            builder: (context) => add_new_address()));
+
+                                                    if (refresh == 'refresh') {
+                                                      getAddressList();
+                                                    }
                                                   },
                                                   child: Container(
-                                                    padding: EdgeInsets.only(left: 5),
+                                                    padding:
+                                                    EdgeInsets.only(
+                                                        left: 5),
                                                     child: Row(
                                                       children: [
                                                         Image.asset(
@@ -286,12 +327,15 @@ class address_list_State extends State<address_list> with WidgetsBindingObserver
                                                           width: 15,
                                                           height: 15,
                                                         ),
-                                                        SizedBox(width: 5),
+                                                        SizedBox(
+                                                            width: 5),
                                                         Text(
                                                           'Edit',
-                                                          style: TextStyle(
+                                                          style:
+                                                          TextStyle(
                                                             fontSize: 11,
-                                                            color: Colors.black,
+                                                            color: Colors
+                                                                .black,
                                                           ),
                                                         ),
                                                       ],
@@ -300,10 +344,12 @@ class address_list_State extends State<address_list> with WidgetsBindingObserver
                                                 ),
                                                 InkWell(
                                                   onTap: () {
-                                                    showRemoveAddressDialog(context,uid);
+                                                    showRemoveAddressDialog(context, uid);
                                                   },
                                                   child: Container(
-                                                    padding: EdgeInsets.only(right:25),
+                                                    padding:
+                                                    EdgeInsets.only(
+                                                        right: 25),
                                                     child: Row(
                                                       children: [
                                                         Image.asset(
@@ -311,10 +357,12 @@ class address_list_State extends State<address_list> with WidgetsBindingObserver
                                                           width: 15,
                                                           height: 15,
                                                         ),
-                                                        SizedBox(width: 5),
+                                                        SizedBox(
+                                                            width: 5),
                                                         const Text(
                                                           'Remove',
-                                                          style: TextStyle(
+                                                          style:
+                                                          TextStyle(
                                                             fontSize: 11,
                                                             color: Colors.black,
                                                           ),
@@ -323,15 +371,14 @@ class address_list_State extends State<address_list> with WidgetsBindingObserver
                                                     ),
                                                   ),
                                                 ),
-
                                               ],
                                             ),
                                           ),
                                         ),
-
                                         Container(
-                                          padding: EdgeInsets.only(right: 5),
-                                          child:  Text(
+                                          padding:
+                                          EdgeInsets.only(right: 5),
+                                          child: Text(
                                             address_type.toUpperCase(),
                                             style: TextStyle(
                                               fontWeight: FontWeight.bold,
@@ -339,11 +386,9 @@ class address_list_State extends State<address_list> with WidgetsBindingObserver
                                               color: Colors.teal,
                                             ),
                                           ),
-
                                         ),
                                       ],
                                     ),
-
                                     SizedBox(height: 5),
                                   ],
                                 ),
@@ -356,12 +401,230 @@ class address_list_State extends State<address_list> with WidgetsBindingObserver
                         Center(
                           child: CircularProgressIndicator(
                             strokeWidth: 3.0,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                            valueColor:
+                            AlwaysStoppedAnimation<Color>(Colors.red),
                           ),
                         ),
                     ],
                   ),
-                ),
+                )
+                    :
+                Expanded(
+                  child: Stack(
+                    children: [
+                      Visibility(
+                        visible: islistview,
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: data.length,
+                          itemBuilder: (context, index) {
+                            final item = data[index];
+                            final full_name = item['full_name'];
+                            final address = item['address'];
+                            final uid = item['uid'];
+                            final ccode = item['ccode'];
+                            final phone = item['phone'];
+                            final pincode = item['pincode'];
+                            final city = item['city'];
+                            final state = item['state'];
+                            final landmark = item['landmark'];
+                            final address_type = item['address_type'];
+
+                            return GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  selectedIndex = index;
+                                  isEditLayout = true;
+                                });
+                              },
+                              child: Container(
+                                margin: EdgeInsets.all(5),
+                                padding: EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                  color: selectedIndex == index
+                                      ? Color(0xFFE4E4E4)
+                                      : Colors.white,
+                                ),
+                                child: Column(
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(height: 5),
+                                    Text(
+                                      full_name,
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                    SizedBox(height: 10),
+                                    Row(
+                                      children: [
+                                        Image.asset('assets/mobile.png',
+                                            width: 10, height: 10),
+                                        SizedBox(width: 2),
+                                        Text(
+                                         phone,
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            color: Colors.red,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 10),
+                                    Text(
+                                      address +
+                                          "\n" +
+                                          state +
+                                          " | " +
+                                          city,
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                    SizedBox(height: 10),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          flex: 2,
+                                          child: Text(
+                                            pincode,
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 12,
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                        ),
+                                        Visibility(
+                                          visible:
+                                          selectedIndex == index &&
+                                              isEditLayout,
+                                          child: Expanded(
+                                            flex: 2,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                              MainAxisAlignment
+                                                  .spaceBetween,
+                                              crossAxisAlignment:
+                                              CrossAxisAlignment
+                                                  .center,
+                                              children: [
+                                                InkWell(
+                                                  onTap: () async {
+                                                    store_class
+                                                        .isUpdateAddress =
+                                                    true;
+                                                    store_class
+                                                        .address_uid =
+                                                        uid;
+                                                    String refresh = await Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                            builder: (context) => add_new_address()));
+
+                                                    if (refresh == 'refresh') {
+                                                      getAddressList();
+                                                    }
+                                                  },
+                                                  child: Container(
+                                                    padding:
+                                                    EdgeInsets.only(
+                                                        left: 5),
+                                                    child: Row(
+                                                      children: [
+                                                        Image.asset(
+                                                          'assets/edit.png',
+                                                          width: 15,
+                                                          height: 15,
+                                                        ),
+                                                        SizedBox(
+                                                            width: 5),
+                                                        Text(
+                                                          'Edit',
+                                                          style:
+                                                          TextStyle(
+                                                            fontSize: 11,
+                                                            color: Colors
+                                                                .black,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                                InkWell(
+                                                  onTap: () {
+                                                    showRemoveAddressDialog(
+                                                        context, uid);
+                                                  },
+                                                  child: Container(
+                                                    padding:
+                                                    EdgeInsets.only(
+                                                        right: 25),
+                                                    child: Row(
+                                                      children: [
+                                                        Image.asset(
+                                                          'assets/trash.png',
+                                                          width: 15,
+                                                          height: 15,
+                                                        ),
+                                                        SizedBox(
+                                                            width: 5),
+                                                        const Text(
+                                                          'Remove',
+                                                          style:
+                                                          TextStyle(
+                                                            fontSize: 11,
+                                                            color: Colors
+                                                                .black,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                        Container(
+                                          padding:
+                                          EdgeInsets.only(right: 5),
+                                          child: Text(
+                                            address_type.toUpperCase(),
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 11,
+                                              color: Colors.teal,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 5),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      if (isLoading)
+                        const Center(
+                          child: CircularProgressIndicator(
+                            strokeWidth: 3.0,
+                            valueColor:
+                            AlwaysStoppedAnimation<Color>(Colors.red),
+                          ),
+                        ),
+                    ],
+                  ),
+                )
               ],
             ),
           ],
@@ -369,11 +632,13 @@ class address_list_State extends State<address_list> with WidgetsBindingObserver
       ),
     );
   }
+
   Future<void> getAddressList() async {
     setState(() {
+      isRefresh = true;
       isLoading = true;
-      islistview=false;
-      isEmpview=false;
+      islistview = false;
+      isEmpview = false;
     });
     var sharedPrefs = await SharedPreferences.getInstance();
     final headers = {
@@ -388,15 +653,15 @@ class address_list_State extends State<address_list> with WidgetsBindingObserver
     if (response.statusCode == 200) {
       final responseData = jsonDecode(response.body);
       setState(() {
-        islistview=true;
+        islistview = true;
         isLoading = false;
-        isEmpview=false;
+        isEmpview = false;
         data = responseData['Data'];
       });
     } else if (response.statusCode == 404) {
       setState(() {
-        isEmpview=true;
-        islistview=false;
+        isEmpview = true;
+        islistview = false;
         isLoading = false;
       });
       var sharedPrefs = await SharedPreferences.getInstance();
@@ -405,7 +670,6 @@ class address_list_State extends State<address_list> with WidgetsBindingObserver
       print('Error: ${response.statusCode}');
     }
   }
-
 
   Future<void> deleteAddress(String uid) async {
     var sharedPrefs = await SharedPreferences.getInstance();
@@ -420,14 +684,12 @@ class address_list_State extends State<address_list> with WidgetsBindingObserver
 
     if (response.statusCode == 200) {
       getAddressList();
-    } else if (response.statusCode == 404) {
-      getAddressList();
     } else {
-      getAddressList();
+      print('error deleting address');
     }
   }
 
-  void showRemoveAddressDialog(BuildContext context,String uid) {
+  void showRemoveAddressDialog(BuildContext context, String uid) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -491,5 +753,4 @@ class address_list_State extends State<address_list> with WidgetsBindingObserver
       },
     );
   }
-
 }

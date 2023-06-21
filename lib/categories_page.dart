@@ -17,14 +17,14 @@ class _categories_pageState extends State<categories_page> {
   List<dynamic> category = [];
   SharedPreferences? sharedPrefs;
   int selectedIndex = 0;
-  String? cat_img_path;
+  String? cat_img_path,sub_cat_img_path;
   @override
   void initState() {
-    fetchMainCategory();
+    callMainCategoryList();
     super.initState();
   }
 
-  Future<void> fetchMainCategory() async {
+  Future<void> callMainCategoryList() async {
     sharedPrefs = await SharedPreferences.getInstance();
     final headers = {
       "dtoken": sharedPrefs?.getString("dtoken") ?? "",
@@ -47,7 +47,7 @@ class _categories_pageState extends State<categories_page> {
     }
   }
 
-  Future<void> fetchCategory(String mcid) async {
+  Future<void> callCategoriesList(String mcid) async {
     sharedPrefs = await SharedPreferences.getInstance();
     final headers = {
       "dtoken": sharedPrefs?.getString("dtoken") ?? "",
@@ -60,8 +60,10 @@ class _categories_pageState extends State<categories_page> {
 
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
-      category = jsonData['Data'];
-      setState(() {});
+      setState(() {
+        category = jsonData['Data'];
+        sub_cat_img_path=jsonData['sub_cat_img_path'];
+      });
     } else {
       print('Failed to fetch data. Status code: ${response.statusCode}');
     }
@@ -163,7 +165,7 @@ class _categories_pageState extends State<categories_page> {
                               onTap: () {
                                 setState(() {
                                   selectedIndex = index;// Set the selected index
-                                  fetchCategory(mcid);
+                                  callCategoriesList(mcid);
                                 });
                               },
                               child: Container(
@@ -245,10 +247,11 @@ class _categories_pageState extends State<categories_page> {
                                 child: SingleChildScrollView(
                                   scrollDirection: Axis.horizontal,
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start, // Align items to the left
+                                    crossAxisAlignment: CrossAxisAlignment.start, // Align items to the center
                                     children: <Widget>[
                                       for (int i = 0; i < subcategories.length; i += 3)
                                         Row(
+                                        //  mainAxisAlignment: MainAxisAlignment.start, // Center-align the items in each row
                                           children: [
                                             for (var subcategory in subcategories.skip(i).take(3))
                                               Padding(
@@ -256,11 +259,11 @@ class _categories_pageState extends State<categories_page> {
                                                 child: Container(
                                                   width: 70,
                                                   child: Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start, // Align items to the left
+                                                   // mainAxisAlignment: MainAxisAlignment.start, // Center-align the items in each column
                                                     children: [
                                                       ClipOval(
                                                         child: Image.network(
-                                                          '${store_class.base_url}/static/subcat/${subcategory['iconname']}',
+                                                          store_class.base_url + sub_cat_img_path! + subcategory['iconname'],
                                                           height: 50,
                                                         ),
                                                       ),
@@ -291,6 +294,7 @@ class _categories_pageState extends State<categories_page> {
                       ),
                     ),
                   ),
+
 
 
                 ],
