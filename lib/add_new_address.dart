@@ -560,7 +560,7 @@ class _add_new_addressState extends State<add_new_address> {
   }
 
   void finish() {
-    Navigator.pop(context,'refresh');
+    Navigator.pop(context,true);
   }
 
   void updateUI() async {

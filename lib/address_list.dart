@@ -16,12 +16,14 @@ class address_list extends StatefulWidget {
 class address_list_State extends State<address_list>
     with WidgetsBindingObserver {
   List<dynamic> data = [];
-  int selectedIndex = 0;
+  int selectedIndex = -1;
   bool isEmpview = false;
   bool islistview = false;
   bool isLoading = false;
   bool isEditLayout = true;
   bool isRefresh = false;
+  bool isDeliverButton=false;
+  String? addressuid;
   @override
   void initState() {
     super.initState();
@@ -86,12 +88,12 @@ class address_list_State extends State<address_list>
                         onTap: () async {
                           store_class.isUpdateAddress = false;
 
-                          String refresh = await Navigator.push(
+                          bool refresh = await Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (context) => add_new_address()));
 
-                          if (refresh == 'refresh') {
+                          if (refresh) {
                             getAddressList();
                           }
                         },
@@ -159,10 +161,10 @@ class address_list_State extends State<address_list>
                 InkWell(
                   onTap: () async{
                     store_class.isUpdateAddress = false;
-                    String refresh = await Navigator.push(
+                    bool refresh = await Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => add_new_address()));
-                    if (refresh == 'refresh') {
+                    if (refresh) {
                       getAddressList();
                     }
                   },
@@ -192,8 +194,7 @@ class address_list_State extends State<address_list>
                     ),
                   ),
                 ),
-                isRefresh
-                    ?
+
                 Expanded(
                   child: Stack(
                     children: [
@@ -216,10 +217,15 @@ class address_list_State extends State<address_list>
                             final address_type = item['address_type'];
 
                             return GestureDetector(
-                              onTap: () {
+                              onTap: () async{
+                                var sharedPrefs = await SharedPreferences.getInstance();
+                                sharedPrefs.setInt("selectedIndex", index);
                                 setState(() {
                                   selectedIndex = index;
                                   isEditLayout = true;
+                                  addressuid=uid;
+
+                                  print(selectedIndex);
                                 });
                               },
                               child: Container(
@@ -307,227 +313,12 @@ class address_list_State extends State<address_list>
                                                     store_class
                                                         .address_uid =
                                                         uid;
-                                                    String refresh = await Navigator.push(
+                                                    bool refresh = await Navigator.push(
                                                         context,
                                                         MaterialPageRoute(
                                                             builder: (context) => add_new_address()));
 
-                                                    if (refresh == 'refresh') {
-                                                      getAddressList();
-                                                    }
-                                                  },
-                                                  child: Container(
-                                                    padding:
-                                                    EdgeInsets.only(
-                                                        left: 5),
-                                                    child: Row(
-                                                      children: [
-                                                        Image.asset(
-                                                          'assets/edit.png',
-                                                          width: 15,
-                                                          height: 15,
-                                                        ),
-                                                        SizedBox(
-                                                            width: 5),
-                                                        Text(
-                                                          'Edit',
-                                                          style:
-                                                          TextStyle(
-                                                            fontSize: 11,
-                                                            color: Colors
-                                                                .black,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                                InkWell(
-                                                  onTap: () {
-                                                    showRemoveAddressDialog(context, uid);
-                                                  },
-                                                  child: Container(
-                                                    padding:
-                                                    EdgeInsets.only(
-                                                        right: 25),
-                                                    child: Row(
-                                                      children: [
-                                                        Image.asset(
-                                                          'assets/trash.png',
-                                                          width: 15,
-                                                          height: 15,
-                                                        ),
-                                                        SizedBox(
-                                                            width: 5),
-                                                        const Text(
-                                                          'Remove',
-                                                          style:
-                                                          TextStyle(
-                                                            fontSize: 11,
-                                                            color: Colors.black,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                        Container(
-                                          padding:
-                                          EdgeInsets.only(right: 5),
-                                          child: Text(
-                                            address_type.toUpperCase(),
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 11,
-                                              color: Colors.teal,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 5),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      if (isLoading)
-                        Center(
-                          child: CircularProgressIndicator(
-                            strokeWidth: 3.0,
-                            valueColor:
-                            AlwaysStoppedAnimation<Color>(Colors.red),
-                          ),
-                        ),
-                    ],
-                  ),
-                )
-                    :
-                Expanded(
-                  child: Stack(
-                    children: [
-                      Visibility(
-                        visible: islistview,
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: data.length,
-                          itemBuilder: (context, index) {
-                            final item = data[index];
-                            final full_name = item['full_name'];
-                            final address = item['address'];
-                            final uid = item['uid'];
-                            final ccode = item['ccode'];
-                            final phone = item['phone'];
-                            final pincode = item['pincode'];
-                            final city = item['city'];
-                            final state = item['state'];
-                            final landmark = item['landmark'];
-                            final address_type = item['address_type'];
-
-                            return GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  selectedIndex = index;
-                                  isEditLayout = true;
-                                });
-                              },
-                              child: Container(
-                                margin: EdgeInsets.all(5),
-                                padding: EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(8),
-                                  color: selectedIndex == index
-                                      ? Color(0xFFE4E4E4)
-                                      : Colors.white,
-                                ),
-                                child: Column(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                                  children: [
-                                    SizedBox(height: 5),
-                                    Text(
-                                      full_name,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 15,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                    SizedBox(height: 10),
-                                    Row(
-                                      children: [
-                                        Image.asset('assets/mobile.png',
-                                            width: 10, height: 10),
-                                        SizedBox(width: 2),
-                                        Text(
-                                         phone,
-                                          style: TextStyle(
-                                            fontSize: 10,
-                                            color: Colors.red,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(height: 10),
-                                    Text(
-                                      address +
-                                          "\n" +
-                                          state +
-                                          " | " +
-                                          city,
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                    SizedBox(height: 10),
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          flex: 2,
-                                          child: Text(
-                                            pincode,
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 12,
-                                              color: Colors.black,
-                                            ),
-                                          ),
-                                        ),
-                                        Visibility(
-                                          visible:
-                                          selectedIndex == index &&
-                                              isEditLayout,
-                                          child: Expanded(
-                                            flex: 2,
-                                            child: Row(
-                                              mainAxisAlignment:
-                                              MainAxisAlignment
-                                                  .spaceBetween,
-                                              crossAxisAlignment:
-                                              CrossAxisAlignment
-                                                  .center,
-                                              children: [
-                                                InkWell(
-                                                  onTap: () async {
-                                                    store_class
-                                                        .isUpdateAddress =
-                                                    true;
-                                                    store_class
-                                                        .address_uid =
-                                                        uid;
-                                                    String refresh = await Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                            builder: (context) => add_new_address()));
-
-                                                    if (refresh == 'refresh') {
+                                                    if (refresh) {
                                                       getAddressList();
                                                     }
                                                   },
@@ -624,7 +415,40 @@ class address_list_State extends State<address_list>
                         ),
                     ],
                   ),
-                )
+                ),
+
+                Visibility(
+                  visible: isDeliverButton,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 10,right: 10,bottom: 5,top: 5),
+                    child: Container(
+                      width: double.infinity,
+                      height: 40,
+                      child: ElevatedButton(
+                        onPressed: () async{
+                          if(selectedIndex==-1){
+                            Fluttertoast.showToast(msg: "Please select your order delivery address", toastLength: Toast.LENGTH_LONG, gravity: ToastGravity.BOTTOM, backgroundColor: Colors.white60, textColor: Colors.black,);
+                          }
+                          else{
+                            var sharedPrefs = await SharedPreferences.getInstance();
+                            sharedPrefs.setString("address_id", addressuid!);
+                            sharedPrefs.setString("delivery_address", "true");
+
+                            Future.delayed(Duration.zero, () {
+                              Navigator.pop(context);
+                            });
+                          }
+
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                        ),
+                        child: Text('DELIVER TO THIS ADDRESS'),
+                      ),
+                    ),
+                  ),
+                ),
+
               ],
             ),
           ],
@@ -634,13 +458,16 @@ class address_list_State extends State<address_list>
   }
 
   Future<void> getAddressList() async {
+    var sharedPrefs = await SharedPreferences.getInstance();
+
     setState(() {
       isRefresh = true;
       isLoading = true;
       islistview = false;
       isEmpview = false;
+      isDeliverButton=false;
     });
-    var sharedPrefs = await SharedPreferences.getInstance();
+
     final headers = {
       "dtoken": sharedPrefs.getString("dtoken") ?? "",
     };
@@ -654,19 +481,32 @@ class address_list_State extends State<address_list>
       final responseData = jsonDecode(response.body);
       setState(() {
         islistview = true;
+        isDeliverButton=true;
         isLoading = false;
         isEmpview = false;
         data = responseData['Data'];
+        selectedIndex=sharedPrefs.getInt("selectedIndex")!;
+
+        print(selectedIndex);
+
       });
     } else if (response.statusCode == 404) {
       setState(() {
         isEmpview = true;
         islistview = false;
         isLoading = false;
+        isDeliverButton=false;
       });
       var sharedPrefs = await SharedPreferences.getInstance();
       sharedPrefs.setString("address", "false");
-    } else {
+      sharedPrefs.setString("delivery_address", "false");
+      sharedPrefs.setInt("selectedIndex", -1);
+    }
+    else {
+      isLoading = false;
+      islistview = false;
+      isEmpview = false;
+      isDeliverButton=false;
       print('Error: ${response.statusCode}');
     }
   }

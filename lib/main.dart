@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:big_commerce/add_new_address.dart';
 import 'package:big_commerce/address_list.dart';
 import 'package:big_commerce/categories_page.dart';
@@ -11,7 +13,8 @@ import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 void main() {
   runApp(const MyApp());
 }
@@ -249,16 +252,18 @@ class _Home_screenState extends State<Home_screen> with WidgetsBindingObserver  
   bool isAddAddresslayout = false;
   SharedPreferences? sharedPrefs;
   int myindex = 0;
+  String? deliverytxtview;
+
   @override
   void initState() {
     checkRegistrationStatus();
     super.initState();
-    WidgetsBinding.instance?.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance?.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -341,40 +346,40 @@ class _Home_screenState extends State<Home_screen> with WidgetsBindingObserver  
                   children: [
                     Visibility(
                       visible: isSignuptoaddlayout, // Set visibility based on your logic
-                      child: Row(
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.all(10),
-                            child: Image.asset(
-                              'assets/add_addres.gif', // Replace with your image path
-                              width: 30,
-                              height: 30,
+                      child: InkWell(
+                        onTap: (){
+                          store_class.opentype ='home';
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            isDismissible: false,
+                            enableDrag: false,
+                            builder: (BuildContext context) {
+                              return SingleChildScrollView(
+                                child: Padding(
+                                  padding: EdgeInsets.only(
+                                    bottom: MediaQuery.of(context).viewInsets.bottom,
+                                  ),
+                                  child: BottomSheetWidget(onTabChanged: changeTab),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                        child: Row(
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.all(10),
+                              child: Image.asset(
+                                'assets/add_addres.gif', // Replace with your image path
+                                width: 30,
+                                height: 30,
+                              ),
                             ),
-                          ),
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () {
-                                store_class.opentype ='home';
-                                showModalBottomSheet(
-                                  context: context,
-                                  isScrollControlled: true,
-                                  isDismissible: false,
-                                  enableDrag: false,
-                                  builder: (BuildContext context) {
-                                    return SingleChildScrollView(
-                                      child: Padding(
-                                        padding: EdgeInsets.only(
-                                          bottom: MediaQuery.of(context).viewInsets.bottom,
-                                        ),
-                                        child: BottomSheetWidget(onTabChanged: changeTab),
-                                      ),
-                                    );
-                                  },
-                                );
-                              },
+                            Expanded(
                               child: Row(
                                 children: [
-                                  Text(
+                                  const Text(
                                     'Signup to add location and address details',
                                     style: TextStyle(
                                       color: Color(0xFF424242),
@@ -393,68 +398,77 @@ class _Home_screenState extends State<Home_screen> with WidgetsBindingObserver  
                                 ],
                               ),
                             ),
-                          ),
 
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                    Visibility(
-                      visible: isDeliveringtolocationlayout, // Set visibility based on your logic
-                      child: Row(
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 0),
-                            child: Image.asset(
-                              'assets/home_loc.gif', // Replace with your image path
-                              height: 50,
-                              width: 50,
+                    InkWell(
+                      onTap: (){
+                        selectAddress_Sheet(context);
+                      },
+                      child: Visibility(
+                        visible: isDeliveringtolocationlayout, // Set visibility based on your logic
+                        child: Row(
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 0),
+                              child: Image.asset(
+                                'assets/home_loc.gif', // Replace with your image path
+                                height: 50,
+                                width: 50,
+                              ),
                             ),
-                          ),
-                          Expanded(
-                            child: Row(
-                              children: [
-                                Text(
-                                  'Delivering to Faridabad - 121012',
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 12,
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  Text(
+                                    deliverytxtview ?? '',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
                                   ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(left: 5),
-                                  child: Image.asset(
-                                    'assets/arrow.png', // Replace with your image path
-                                    height: 12,
-                                    width: 12,
+                                  Padding(
+                                    padding: EdgeInsets.only(left: 5),
+                                    child: Image.asset(
+                                      'assets/arrow.png', // Replace with your image path
+                                      height: 12,
+                                      width: 12,
+                                    ),
                                   ),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                    Visibility(
-                      visible: isAddAddresslayout, // Set visibility based on your logic
-                      child: Row(
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.all(10),
-                            child: Image.asset(
-                              'assets/add_addres.gif', // Replace with your image path
-                              width: 30,
-                              height: 30,
+                    InkWell(
+                      onTap: () async {
+                        bool refresh = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => add_new_address()));
+
+                        if (refresh) {
+                          checkRegistrationStatus();
+                        }
+                      },
+                      child: Visibility(
+                        visible: isAddAddresslayout, // Set visibility based on your logic
+                        child: Row(
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.all(10),
+                              child: Image.asset(
+                                'assets/add_addres.gif', // Replace with your image path
+                                width: 30,
+                                height: 30,
+                              ),
                             ),
-                          ),
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () {
-                                final route = MaterialPageRoute(builder: (_) => add_new_address());
-                                Future.delayed(Duration.zero, () {
-                                  Navigator.push(context, route);
-                                });
-                              },
+                            Expanded(
                               child: Row(
                                 children: [
                                   Text(
@@ -476,9 +490,9 @@ class _Home_screenState extends State<Home_screen> with WidgetsBindingObserver  
                                 ],
                               ),
                             ),
-                          ),
 
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ],
@@ -503,6 +517,7 @@ class _Home_screenState extends State<Home_screen> with WidgetsBindingObserver  
     SharedPreferences sharedPrefs = await SharedPreferences.getInstance();
     String? permVerify = sharedPrefs.getString("perm_verify");
     String? address = sharedPrefs.getString("address");
+    String? deliveryAddress = sharedPrefs.getString("delivery_address");
 
     setState(() {
       if(permVerify?.toLowerCase() == "true"){
@@ -523,7 +538,93 @@ class _Home_screenState extends State<Home_screen> with WidgetsBindingObserver  
         isAddAddresslayout = false;
       }
 
+      if(deliveryAddress?.toLowerCase() == 'true'){
+        String? addressUid = sharedPrefs.getString("address_id");
+        getAddress(addressUid!);
+      }
+      else{
+        deliverytxtview='Please select your Delivery address';
+      }
+
     });
+  }
+
+  Future<void> getAddress(String addressuid) async {
+    SharedPreferences sharedPrefs = await SharedPreferences.getInstance();
+    final headers = {
+      "dtoken": sharedPrefs.getString("dtoken") ?? "",
+    };
+
+    final response = await http.get(
+      Uri.parse("${store_class.base_url}user/address/${addressuid}"),
+      headers: headers,
+    );
+
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      setState(() {
+        deliverytxtview='Delivering to '+responseData['city']+" - "+responseData['pincode'];
+      });
+    }
+    else {
+      print('Error: ${response.statusCode}');
+    }
+  }
+
+  void selectAddress_Sheet(BuildContext context){
+    showModalBottomSheet(
+        context: context,
+        enableDrag: false,
+        isDismissible: false,
+        builder: (BuildContext context) {
+          return Column(
+            children: [
+              InkWell(
+                onTap: (){
+                  Navigator.pop(context);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Align(alignment:Alignment.topRight,
+                      child: Image.asset('assets/close.png', width: 24, height: 24,)),
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.only(left: 20),
+                child: Align(
+                    alignment: Alignment.topLeft,
+                    child: Text('Please Confirm order delivery address',
+                      style: TextStyle(
+                      fontWeight: FontWeight.w400,
+                        fontSize: 17,
+                        color: Colors.black,
+                    ),),
+                ),
+              ),
+              const SizedBox(height: 5,),
+              const Padding(
+                padding: EdgeInsets.only(left: 20),
+                child: Align(
+                    alignment: Alignment.topLeft,
+                  child: Text('Order will be deliver to this address',
+                  style: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 12,
+                  ),),
+                ),
+              ),
+              const SizedBox(height: 10,),
+              const Padding(
+                  padding: EdgeInsets.only(left: 20,right: 20),
+                  child: Divider(height: 1,)),
+              const SizedBox(height: 10,),
+
+              
+
+            ],
+          );
+        }
+    );
   }
 
 }
