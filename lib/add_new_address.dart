@@ -546,16 +546,14 @@ class _add_new_addressState extends State<add_new_address> {
         },
       );
 
-      print(requestBody);
-
       if (response.statusCode == 200) {
         Fluttertoast.showToast(msg: "Address Updated", toastLength: Toast.LENGTH_LONG, gravity: ToastGravity.BOTTOM, backgroundColor: Colors.white60, textColor: Colors.black,);
         finish();
       } else {
-        print('POST request failed with status: ${response.statusCode}');
+        print('add_new_address: ${response.statusCode}');
       }
     } catch (error) {
-      print('Exception occurred: $error');
+      print('Exception occurred add_new_address: $error');
     }
   }
 
@@ -573,23 +571,22 @@ class _add_new_addressState extends State<add_new_address> {
   }
 
   Future<void> getDataFromPinCode(String pinCode) async {
-    final response = await http.get(
-      Uri.parse(store_class.postalURL + pinCode),
-    );
+    final response = await http.get(Uri.parse(store_class.postalURL + pinCode));
 
     if (response.statusCode == 200) {
       final responseData = jsonDecode(response.body);
-      setState(() {
-        data = responseData['PostOffice'];
-        _stateController.text=data[0]['State'];
-        _cityController.text=data[0]['District'];
-        _addressController.text=data[0]['Name'];
-      });
-    }
-    else {
-      print('Error: ${response.statusCode}');
+      if (responseData != null && responseData['PostOffice'] != null) {
+        setState(() {
+          data = responseData['PostOffice'];
+          _stateController.text = data[0]['State'];
+          _cityController.text = data[0]['District'];
+          _addressController.text = data[0]['Name'];
+        });
+      }
+    } else {
     }
   }
+
 
   Future<void> getAddress() async {
     SharedPreferences sharedPrefs = await SharedPreferences.getInstance();

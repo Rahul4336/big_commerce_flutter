@@ -24,6 +24,7 @@ class address_list_State extends State<address_list>
   bool isRefresh = false;
   bool isDeliverButton=false;
   String? addressuid;
+  bool isDeliveringToAddress = true;
   @override
   void initState() {
     super.initState();
@@ -161,10 +162,11 @@ class address_list_State extends State<address_list>
                 InkWell(
                   onTap: () async{
                     store_class.isUpdateAddress = false;
-                    bool refresh = await Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => add_new_address()));
+                    var refresh = await Navigator.push<bool?>(context, MaterialPageRoute(builder: (context) => add_new_address())) ?? false;
                     if (refresh) {
+                      getAddressList();
+                    }
+                    else{
                       getAddressList();
                     }
                   },
@@ -216,40 +218,87 @@ class address_list_State extends State<address_list>
                             final landmark = item['landmark'];
                             final address_type = item['address_type'];
 
-                            return GestureDetector(
-                              onTap: () async{
-                                var sharedPrefs = await SharedPreferences.getInstance();
-                                sharedPrefs.setInt("selectedIndex", index);
+                            if(addressuid==uid){
+                              checkInitial(uid);
+                              selectedIndex = index;
+                            }
+
+                            return InkWell(
+                              onTap: () {
                                 setState(() {
+                                  addressuid=uid;
                                   selectedIndex = index;
                                   isEditLayout = true;
-                                  addressuid=uid;
-
-                                  print(selectedIndex);
+                                  checkDeliveringToAddress();
                                 });
                               },
                               child: Container(
                                 margin: EdgeInsets.all(5),
                                 padding: EdgeInsets.all(10),
+
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(8),
-                                  color: selectedIndex == index
-                                      ? Color(0xFFE4E4E4)
-                                      : Colors.white,
+                                  color: selectedIndex == -1 ? Colors.white : (selectedIndex == index ? Color(0xFFE4E4E4) : Colors.white),
                                 ),
                                 child: Column(
                                   crossAxisAlignment:
                                   CrossAxisAlignment.start,
                                   children: [
                                     SizedBox(height: 5),
-                                    Text(
-                                      full_name,
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 15,
-                                        color: Colors.black,
+
+                                    Row(children: [
+                                      Expanded(
+                                        flex: 3,
+                                        child:  Text(
+                                          full_name,
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 15,
+                                            color: Colors.black,
+                                          ),
+                                        ),),
+
+                                      Visibility(
+                                          visible:
+                                          selectedIndex == index &&
+                                              isEditLayout,
+                                          child: Expanded(
+
+                                            child: InkWell(
+                                                onTap: (){
+                                                  showAddressDetail(context,full_name,address_type,
+                                                      address,
+                                                      pincode,phone,landmark,state,city);
+                                                },
+                                                child: Align(
+                                                    alignment: Alignment.topRight,
+
+                                                    child: Image.asset('assets/more.png',width: 30,height: 30,)
+                                                )
+                                            ),
+                                          )
                                       ),
-                                    ),
+
+                                      Visibility(
+                                          visible:
+                                          selectedIndex == index &&
+                                              isEditLayout,
+                                          child: Expanded(
+
+                                            child: InkWell(
+                                                onTap: (){
+                                                  showAddressDetail(context,full_name,address_type,
+                                                      address,
+                                                  pincode,phone,landmark,state,city);
+                                                },
+                                                child: Align(
+                                                    alignment: Alignment.topRight,
+                                                    child: Image.asset('assets/select_addr.png',width: 30,height: 30,))),)
+                                      ),
+
+
+                                    ],),
+
                                     SizedBox(height: 10),
                                     Row(
                                       children: [
@@ -307,16 +356,9 @@ class address_list_State extends State<address_list>
                                               children: [
                                                 InkWell(
                                                   onTap: () async {
-                                                    store_class
-                                                        .isUpdateAddress =
-                                                    true;
-                                                    store_class
-                                                        .address_uid =
-                                                        uid;
-                                                    bool refresh = await Navigator.push(
-                                                        context,
-                                                        MaterialPageRoute(
-                                                            builder: (context) => add_new_address()));
+                                                    store_class.isUpdateAddress = true;
+                                                    store_class.address_uid = uid;
+                                                    bool refresh = await Navigator.push(context, MaterialPageRoute(builder: (context) => add_new_address()));
 
                                                     if (refresh) {
                                                       getAddressList();
@@ -395,6 +437,7 @@ class address_list_State extends State<address_list>
                                             ),
                                           ),
                                         ),
+                                        
                                       ],
                                     ),
                                     SizedBox(height: 5),
@@ -425,25 +468,33 @@ class address_list_State extends State<address_list>
                       width: double.infinity,
                       height: 40,
                       child: ElevatedButton(
-                        onPressed: () async{
+                        onPressed: isDeliveringToAddress ? null : () async{
                           if(selectedIndex==-1){
                             Fluttertoast.showToast(msg: "Please select your order delivery address", toastLength: Toast.LENGTH_LONG, gravity: ToastGravity.BOTTOM, backgroundColor: Colors.white60, textColor: Colors.black,);
                           }
                           else{
-                            var sharedPrefs = await SharedPreferences.getInstance();
-                            sharedPrefs.setString("address_id", addressuid!);
-                            sharedPrefs.setString("delivery_address", "true");
+                            if (addressuid != null) {
+                              var sharedPrefs = await SharedPreferences.getInstance();
+                              sharedPrefs.setString("address_id", addressuid!);
+                              sharedPrefs.setString("delivery_address", "true");
 
-                            Future.delayed(Duration.zero, () {
-                              Navigator.pop(context);
-                            });
+                              Future.delayed(Duration.zero, () {
+                                Navigator.pop(context,true);
+                              });
+                            } else {
+                              Fluttertoast.showToast(msg: "Oops! unable to fetch address. Please select address", toastLength: Toast.LENGTH_LONG, gravity: ToastGravity.BOTTOM, backgroundColor: Colors.white60, textColor: Colors.black,);
+
+                            }
+
                           }
 
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.red,
                         ),
-                        child: Text('DELIVER TO THIS ADDRESS'),
+                        child: Text(
+                          isDeliveringToAddress ? 'DELIVERING TO THIS ADDRESS' : 'DELIVER TO THIS ADDRESS',
+                        ),
                       ),
                     ),
                   ),
@@ -459,6 +510,7 @@ class address_list_State extends State<address_list>
 
   Future<void> getAddressList() async {
     var sharedPrefs = await SharedPreferences.getInstance();
+    addressuid=sharedPrefs.getString("address_id") ?? "false";
 
     setState(() {
       isRefresh = true;
@@ -466,6 +518,7 @@ class address_list_State extends State<address_list>
       islistview = false;
       isEmpview = false;
       isDeliverButton=false;
+      selectedIndex = -1;
     });
 
     final headers = {
@@ -481,14 +534,9 @@ class address_list_State extends State<address_list>
       final responseData = jsonDecode(response.body);
       setState(() {
         islistview = true;
-        isDeliverButton=true;
         isLoading = false;
         isEmpview = false;
         data = responseData['Data'];
-        selectedIndex=sharedPrefs.getInt("selectedIndex")!;
-
-        print(selectedIndex);
-
       });
     } else if (response.statusCode == 404) {
       setState(() {
@@ -500,14 +548,13 @@ class address_list_State extends State<address_list>
       var sharedPrefs = await SharedPreferences.getInstance();
       sharedPrefs.setString("address", "false");
       sharedPrefs.setString("delivery_address", "false");
-      sharedPrefs.setInt("selectedIndex", -1);
     }
     else {
       isLoading = false;
       islistview = false;
       isEmpview = false;
       isDeliverButton=false;
-      print('Error: ${response.statusCode}');
+      print('getAddressListError: ${response.statusCode}');
     }
   }
 
@@ -524,8 +571,8 @@ class address_list_State extends State<address_list>
 
     if (response.statusCode == 200) {
       getAddressList();
+
     } else {
-      print('error deleting address');
     }
   }
 
@@ -591,6 +638,85 @@ class address_list_State extends State<address_list>
           ),
         );
       },
+    );
+  }
+
+  Future<void> checkInitial(String uid) async {
+    var sharedPrefs = await SharedPreferences.getInstance();
+    String storedaddressuid = sharedPrefs.getString("address_id") ?? 'false';
+
+    setState(() {
+      if(storedaddressuid == uid){
+        isDeliverButton=true;
+        isDeliveringToAddress = true;
+      }
+    });
+  }
+
+
+  Future<void> checkDeliveringToAddress() async {
+    var sharedPrefs = await SharedPreferences.getInstance();
+    String storedaddressuid = sharedPrefs.getString("address_id") ?? 'false';
+
+
+    setState(() {
+      if (addressuid == storedaddressuid) {
+        if (selectedIndex == -1){
+          isDeliverButton=false;
+        }
+        else{
+          isDeliverButton=true;
+          isDeliveringToAddress = true;
+        }
+      }
+      else {
+        isDeliverButton=true;
+        isDeliveringToAddress = false;
+      }
+    });
+  }
+
+  void showAddressDetail(BuildContext context, full_name, address_type, address, pincode, phone, landmark, state, city){
+    showModalBottomSheet(context: context,
+        builder:  (BuildContext context){
+          return Container(
+            padding: EdgeInsets.all(20),
+            width: double.infinity,
+            height: 300,
+            child: Column(
+              children: [
+                Column(
+                  children: [
+                    Image.asset('assets/select_addr.png',width: 50,height: 50,),
+                    const SizedBox(height: 5,),
+                    Text('Delivering your orders to your '+address_type+' address',
+                    style: TextStyle(fontSize: 14,color: Colors.black, fontWeight: FontWeight.w500),),
+                    const SizedBox(height: 10,),
+                    const Divider(height: 1,),
+                    const SizedBox(height: 10,),
+                    Text(full_name,style: TextStyle(fontSize: 23,color: Colors.grey,fontWeight: FontWeight.w600),),
+                    const SizedBox(height: 5,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                      Image.asset('assets/sd_call.png',width: 20,height: 20,),
+                      const SizedBox(width: 5,),
+                      Text(phone,style: TextStyle(color: Colors.green),),
+                    ],),
+                    const SizedBox(height: 10,),
+                    Text(address,style: TextStyle(fontSize: 13,color: Colors.black,),
+                      textAlign: TextAlign.center,),
+                    const SizedBox(height: 5,),
+                    Text(city+", "+state+" | "+pincode,style: TextStyle(fontSize: 13,color: Colors.black,),
+                      textAlign: TextAlign.center,),
+                    const SizedBox(height: 5,),
+                    Text(landmark,style: TextStyle(fontSize: 12,color: Colors.grey),),
+                  ],
+                ),
+              ],
+            ),
+          );
+        }
     );
   }
 }

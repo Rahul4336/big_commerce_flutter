@@ -10,6 +10,7 @@ import 'package:big_commerce/store_class.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -404,8 +405,14 @@ class _Home_screenState extends State<Home_screen> with WidgetsBindingObserver  
                       ),
                     ),
                     InkWell(
-                      onTap: (){
-                        selectAddress_Sheet(context);
+                      onTap: () async{
+                        var refresh = await Navigator.push<bool?>(context, MaterialPageRoute(builder: (context) => address_list())) ?? false;
+                        if (refresh) {
+                          checkRegistrationStatus();
+                        }
+                        else{
+                          checkRegistrationStatus();
+                        }
                       },
                       child: Visibility(
                         visible: isDeliveringtolocationlayout, // Set visibility based on your logic
@@ -447,12 +454,11 @@ class _Home_screenState extends State<Home_screen> with WidgetsBindingObserver  
                     ),
                     InkWell(
                       onTap: () async {
-                        bool refresh = await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => add_new_address()));
-
+                        var refresh = await Navigator.push<bool?>(context, MaterialPageRoute(builder: (context) => add_new_address())) ?? false;
                         if (refresh) {
+                          checkRegistrationStatus();
+                        }
+                        else{
                           checkRegistrationStatus();
                         }
                       },
@@ -541,6 +547,7 @@ class _Home_screenState extends State<Home_screen> with WidgetsBindingObserver  
       if(deliveryAddress?.toLowerCase() == 'true'){
         String? addressUid = sharedPrefs.getString("address_id");
         getAddress(addressUid!);
+        print(addressUid);
       }
       else{
         deliverytxtview='Please select your Delivery address';
@@ -567,66 +574,12 @@ class _Home_screenState extends State<Home_screen> with WidgetsBindingObserver  
       });
     }
     else {
-      print('Error: ${response.statusCode}');
+      setState(() {
+        deliverytxtview='Please select your Delivery address';
+      });
+      print('getAddressError: ${response.statusCode}');
     }
   }
-
-  void selectAddress_Sheet(BuildContext context){
-    showModalBottomSheet(
-        context: context,
-        enableDrag: false,
-        isDismissible: false,
-        builder: (BuildContext context) {
-          return Column(
-            children: [
-              InkWell(
-                onTap: (){
-                  Navigator.pop(context);
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Align(alignment:Alignment.topRight,
-                      child: Image.asset('assets/close.png', width: 24, height: 24,)),
-                ),
-              ),
-              const Padding(
-                padding: EdgeInsets.only(left: 20),
-                child: Align(
-                    alignment: Alignment.topLeft,
-                    child: Text('Please Confirm order delivery address',
-                      style: TextStyle(
-                      fontWeight: FontWeight.w400,
-                        fontSize: 17,
-                        color: Colors.black,
-                    ),),
-                ),
-              ),
-              const SizedBox(height: 5,),
-              const Padding(
-                padding: EdgeInsets.only(left: 20),
-                child: Align(
-                    alignment: Alignment.topLeft,
-                  child: Text('Order will be deliver to this address',
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 12,
-                  ),),
-                ),
-              ),
-              const SizedBox(height: 10,),
-              const Padding(
-                  padding: EdgeInsets.only(left: 20,right: 20),
-                  child: Divider(height: 1,)),
-              const SizedBox(height: 10,),
-
-              
-
-            ],
-          );
-        }
-    );
-  }
-
 }
 
 
