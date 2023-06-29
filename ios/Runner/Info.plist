@@ -54,5 +54,8 @@
       <string>Add your profile image from your device camera</string>
       <key>NSMicrophoneUsageDescription</key>
       <string>search your favourite products by simply speaking to your microphone</string>
+      <key>NSSpeechRecognitionUsageDescription</key>
+      <string>recognize speech</string>
+
 </dict>
 </plist>
