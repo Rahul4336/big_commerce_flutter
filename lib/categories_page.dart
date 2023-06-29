@@ -40,6 +40,7 @@ class _categories_pageState extends State<categories_page> {
       setState(() {
         cat_img_path=responseData['img_path'];
         data = responseData['Data'];
+        callCategoriesList(data[0]['mcid']);
       });
     }
     else {

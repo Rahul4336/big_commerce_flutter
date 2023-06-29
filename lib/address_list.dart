@@ -303,12 +303,12 @@ class address_list_State extends State<address_list>
                                     Row(
                                       children: [
                                         Image.asset('assets/mobile.png',
-                                            width: 10, height: 10),
+                                            width: 12, height: 12),
                                         SizedBox(width: 2),
                                         Text(
                                           phone,
                                           style: TextStyle(
-                                            fontSize: 10,
+                                            fontSize: 12,
                                             color: Colors.red,
                                           ),
                                         ),
@@ -571,8 +571,8 @@ class address_list_State extends State<address_list>
 
     if (response.statusCode == 200) {
       getAddressList();
-
-    } else {
+    }
+    else {
     }
   }
 
@@ -676,7 +676,7 @@ class address_list_State extends State<address_list>
     });
   }
 
-  void showAddressDetail(BuildContext context, full_name, address_type, address, pincode, phone, landmark, state, city){
+  void showAddressDetail(BuildContext context ,full_name, address_type, address, pincode, phone, landmark, state, city){
     showModalBottomSheet(context: context,
         builder:  (BuildContext context){
           return Container(
@@ -689,8 +689,8 @@ class address_list_State extends State<address_list>
                   children: [
                     Image.asset('assets/select_addr.png',width: 50,height: 50,),
                     const SizedBox(height: 5,),
-                    Text('Delivering your orders to your '+address_type+' address',
-                    style: TextStyle(fontSize: 14,color: Colors.black, fontWeight: FontWeight.w500),),
+                      Text('Your '+address_type+' address details',
+                        style: TextStyle(fontSize: 14,color: Colors.black, fontWeight: FontWeight.w500),),
                     const SizedBox(height: 10,),
                     const Divider(height: 1,),
                     const SizedBox(height: 10,),

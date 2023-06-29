@@ -5,6 +5,7 @@ import 'package:big_commerce/address_list.dart';
 import 'package:big_commerce/categories_page.dart';
 import 'package:big_commerce/myorders_page.dart';
 import 'package:big_commerce/register_bottom_sheet.dart';
+import 'package:big_commerce/search.dart';
 import 'package:big_commerce/splash_screen.dart';
 import 'package:big_commerce/store_class.dart';
 import 'package:flutter/material.dart';
@@ -304,11 +305,16 @@ class _Home_screenState extends State<Home_screen> with WidgetsBindingObserver  
                           height: 18,
                         ),
                       ),
-                      Text(
-                        'Search product name or id',
-                        style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 12,
+                      InkWell(
+                        onTap: (){
+                          Navigator.push(context, MaterialPageRoute(builder: (context)=>search()));
+                        },
+                        child: Text(
+                          'Search product name or id',
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 12,
+                          ),
                         ),
                       ),
                       Padding(

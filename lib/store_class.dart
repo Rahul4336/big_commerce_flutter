@@ -8,4 +8,5 @@ class store_class{
   static String postalURL="http://www.postalpincode.in/api/pincode/";
   static bool isVoiceSearch=false;
   static bool isUpdateAddress=false;
+  static String value="";
 }

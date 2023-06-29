@@ -36,6 +36,8 @@ dependencies:
   pin_code_fields: ^7.4.0
   fluttertoast: ^8.0.8
   image_picker: ^0.8.7+5
+  avatar_glow: ^2.0.2
+  speech_to_text: ^6.2.0
 
   flutter:
     sdk: flutter
