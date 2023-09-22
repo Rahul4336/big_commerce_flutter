@@ -104,12 +104,14 @@ class _splash_screenState extends State<splash_screen> with WidgetsBindingObserv
       },
     );
 
+    print(sharedPrefs?.getString("dtoken"));
+
     if (response.statusCode == 200) {
-      Timer(Duration(seconds: 0),(){
+      Timer(const Duration(seconds: 0),(){
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MyMainPage(),));
       });
-    } else {
-      // Request failed
+    }
+    else {
       getTempToken();
     }
   }
@@ -122,10 +124,12 @@ class _splash_screenState extends State<splash_screen> with WidgetsBindingObserv
       'dtoken': sharedPrefs.getString('dtoken') ?? '',
     };
 
+    print(sharedPrefs.getString("dtoken"));
+
     try {
       final response = await http.get(url, headers: headers);
       if (response.statusCode == 200) {
-        Timer(Duration(seconds: 3),(){
+        Timer(const Duration(seconds: 3),(){
           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MyMainPage(),));
         });
       }
@@ -134,7 +138,7 @@ class _splash_screenState extends State<splash_screen> with WidgetsBindingObserv
         getTempToken();
       }
     } catch (error) {
-      print(error);
+      //
     }
   }
 
@@ -199,17 +203,9 @@ class _splash_screenState extends State<splash_screen> with WidgetsBindingObserv
                   backgroundColor: Colors.red, // Set the background color to red
                 ),
               ),
-
-
             ]
-
-          ),
-
-        );
-      },
-
-    );
-
+          ),);
+      },);
   }
 
   void getTempToken() async {
@@ -241,10 +237,9 @@ class _splash_screenState extends State<splash_screen> with WidgetsBindingObserv
       verifyTempToken();
     }
     else {
-      print("Failed to send POST request");
+      //
     }
   }
-
 
   void callStore()
   {

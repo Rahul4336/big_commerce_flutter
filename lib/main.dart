@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -691,7 +692,13 @@ class _myprofile_pageState extends State<myprofile_page> {
                                 children: [
                                   InkWell(
                                     onTap: (){
-                                      selectPhotoSheet(context);
+                                      if (Platform.isIOS) {
+                                        _showPermissionRequiredBottomSheet(context);
+                                      }
+                                      else{
+                                        print("android platform");
+                                      }
+
                                     },
                                     child: Stack(
                                       children: [
@@ -1205,7 +1212,6 @@ class _myprofile_pageState extends State<myprofile_page> {
                   ),
                 ),
               ),
-
               Row(
                 children: [
                   Image.asset(
@@ -1239,7 +1245,6 @@ class _myprofile_pageState extends State<myprofile_page> {
                   ),
                 ],
               ),
-
               SizedBox(height: 10.0),
 
               Container(
@@ -1281,7 +1286,7 @@ class _myprofile_pageState extends State<myprofile_page> {
                   Expanded(
                     child: GestureDetector(
                       onTap: () {
-
+                        checkGalleryPermission(Permission.camera, context);
                       },
                       child: Container(
                         decoration: BoxDecoration(
@@ -1311,6 +1316,28 @@ class _myprofile_pageState extends State<myprofile_page> {
     );
   }
 
+  Future<void> checkGalleryPermission(Permission permission, BuildContext context) async{
+    final status = await permission.request();
+    if(status.isGranted){
+      checkCameraPermission(Permission.camera,context);
+      print('permission allowed');
+    }
+    else{
+      print('permission 2denied');
+    }
+  }
+
+  Future<void> checkCameraPermission(Permission permission, BuildContext context) async{
+    final status = await permission.request();
+    if(status.isGranted){
+      store_class.value='Listening';
+      selectPhotoSheet(context);
+      print('permission 2granted');
+    }
+    else{
+      print('permission 2denied');
+    }
+  }
 
   void selectPhotoSheet(BuildContext context) {
     showModalBottomSheet(

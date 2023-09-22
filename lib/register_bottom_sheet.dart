@@ -631,10 +631,8 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
     if (response.statusCode == 200) {
       var responseData = jsonDecode(response.body);
-      print(responseData);
     }
     else{
-      print('POST request failed with status: ${response.statusCode}');
     }
   }
 
@@ -654,10 +652,8 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
 
     if (response.statusCode == 200) {
       var responseData = jsonDecode(response.body);
-      print(responseData);
     }
     else{
-      print('POST request failed with status: ${response.statusCode}');
     }
   }
 
@@ -680,7 +676,6 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
     if (response.statusCode == 200) {
       String responseBody = response.body;
       Map<String, dynamic> responseJson = json.decode(responseBody);
-      print(responseJson);
 
       SharedPreferences sharedPrefs = await SharedPreferences.getInstance();
       sharedPrefs.setString("dtoken", responseJson["token"]);
@@ -688,7 +683,6 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
       sharedPrefs.setString("mobno", responseJson["mobno"]);
       sharedPrefs.setString("temp_verify", "false");
       sharedPrefs.setString("perm_verify", "true");
-
 
       if (store_class.opentype == 'order') {
          navigateToCartPage();
@@ -719,7 +713,6 @@ class _BottomSheetWidgetState extends State<BottomSheetWidget> {
         backgroundColor: Colors.white60,
         textColor: Colors.black,
       );
-      print('POST request failed with status: ${response.statusCode}');
     }
   }
 

@@ -48,14 +48,14 @@
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 
-     <key>NSPhotoLibraryUsageDescription</key>
+      <key>NSPhotoLibraryUsageDescription</key>
       <string>Add your profile image from your gallery</string>
       <key>NSCameraUsageDescription</key>
       <string>Add your profile image from your device camera</string>
       <key>NSMicrophoneUsageDescription</key>
       <string>search your favourite products by simply speaking to your microphone</string>
       <key>NSSpeechRecognitionUsageDescription</key>
-      <string>recognize speech</string>
+      <string>search your favourite products by simply speaking to your microphone</string>
 
 </dict>
 </plist>

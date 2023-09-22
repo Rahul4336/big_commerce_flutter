@@ -1,12 +1,14 @@
 import 'dart:async';
 
 import 'package:big_commerce/store_class.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'search_results.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:speech_to_text/speech_to_text.dart';
+import 'dart:io' show Platform;
 
 class search extends StatefulWidget {
   search_State createState() => search_State();
@@ -60,17 +62,34 @@ class search_State extends State<search> {
                       ),
                       InkWell(
                         onTap: () {
-                          store_class.value='Listening';
-                          showSpeechDialog(context);
+                        if (Platform.isIOS) {
+                          checkMicrophonePermission(Permission.microphone, context);
+                          }
+                        else{
+                          print('this is android');
+                        }
+
                         },
-                        child: Padding(
-                          padding: EdgeInsets.only(right: 15, left: 15),
-                          child: Image.asset(
-                            'assets/voice.png', // Replace with your image path
-                            width: 18,
-                            height: 18,
-                          ),
-                        ),
+                          child:Container(
+                            margin: EdgeInsets.only(right: 10),
+                            width: 32, // Adjust the width and height as needed
+                            height: 32,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle, // This makes the container circular
+                              color: Colors.red, // Background color of the circle
+                            ),
+                            child: Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(6.0), // Adjust padding as needed
+                                child: Image.asset(
+                                  'assets/voice_search.png',
+                                  width: 18, // Adjust image size as needed
+                                  height: 18,
+                                ),
+                              ),
+                            ),
+                          )
+
                       ),
                     ],
                   ),
@@ -160,6 +179,31 @@ class search_State extends State<search> {
       ),
     );
   }
+
+
+  Future<void> checkMicrophonePermission(Permission permission, BuildContext context) async{
+    final status = await permission.request();
+    if(status.isGranted){
+      checkSpeechPermission(Permission.speech,context);
+      print('permission allowed');
+    }
+    else{
+      print('permission 2denied');
+    }
+  }
+
+  Future<void> checkSpeechPermission(Permission permission, BuildContext context) async{
+    final status = await permission.request();
+    if(status.isGranted){
+      store_class.value='Listening';
+      showSpeechDialog(context);
+      print('permission 2granted');
+    }
+    else{
+      print('permission 2denied');
+    }
+  }
+
 
   void showSpeechDialog(BuildContext context) {
     showDialog(
